@@ -90,8 +90,8 @@ pub fn parse_fastq_gz(input: &PathBuf) -> AllReads {
         .for_each(|(idx, recs)|
             match idx % 4 {
                 0 => { if !&recs.starts_with('@') {
-                                panic!("{:?} IS INVALID FASTQ. LOOKING FOR @ FOUND {} at line {}",
-                                    &input, &recs, &idx + 1);
+                            panic!("{:?} IS INVALID FASTQ. LOOKING FOR @ FOUND {} at line {}",
+                                &input, &recs, &idx + 1);
                         } else { reads += 1 }},
                 1 => sq_per_read.push(SeqReads::count_reads(&recs)), 
                 2 => { if !&recs.starts_with('+') {
