@@ -11,7 +11,7 @@ use clap::{App, Arg};
 
 fn main() {
     let args = App::new("simpleQC")
-        .version("0.1.0-alpha1")
+        .version("0.1.0-alpha1.2")
         .about("Quickly count gc content from a fasta file.")
         .arg(Arg::with_name("input")
             .help("Fastq file to analyze.")
