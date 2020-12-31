@@ -89,13 +89,29 @@ fn write_to_csv(all_reads: &[AllReads]) {
     let output = File::create(outname).unwrap();
     let mut line = LineWriter::new(output);
 
-    writeln!(line, "Sequence Names, GC-content, N-content").unwrap();
+    writeln!(line, "{},{},{},{},{},{},{},{},{}",
+                "Sequence names",
+                "Read counts",
+                "Total sequence length",
+                "GC counts",
+                "GC-content",
+                "N counts",
+                "N-content",
+                "Min read length",
+                "Max read length")
+                .unwrap();
     all_reads.iter()
         .for_each(|seq| {
-            writeln!(line, "{},{},{}", 
-                seq.seqname, 
-                seq.gc_content, 
-                seq.n_content
+            writeln!(line, "{},{},{},{},{},{},{},{},{}", 
+                seq.seqname,
+                seq.read_count,
+                seq.total_base,
+                seq.total_gc, 
+                seq.gc_content,
+                seq.tot_n_count, 
+                seq.n_content,
+                seq.min_reads,
+                seq.max_reads
             ).unwrap();
         });
 
