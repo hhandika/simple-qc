@@ -34,13 +34,14 @@ pub fn process_inputs(path: &PathBuf) {
     
     let all_reads: Vec<_> = receiver.iter().collect();
     
+    println!("\n\x1b[1mResults:\x1b[0m");
     all_reads.iter()
             .for_each(|recs| {
                 write_results_to_console(&recs);
             });
 
     write_to_csv(&all_reads);
-    
+
     let duration = timeit.elapsed();
     println!("Total files: {}", all_reads.len());
 
@@ -84,7 +85,8 @@ fn write_results_to_console(all_reads: &AllReads) {
 }
 
 fn write_to_csv(all_reads: &[AllReads]) {
-    let output = File::create("data/sQC-summary.csv").unwrap();
+    let outname = "sQC-summary.csv";
+    let output = File::create(outname).unwrap();
     let mut line = LineWriter::new(output);
 
     writeln!(line, "Sequence Names, GC-content, N-content").unwrap();
@@ -95,5 +97,7 @@ fn write_to_csv(all_reads: &[AllReads]) {
                 seq.gc_content, 
                 seq.n_content
             ).unwrap();
-        })
+        });
+
+    println!("Summary results is save as {}", outname);
 }
