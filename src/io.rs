@@ -12,7 +12,7 @@ use rayon::prelude::*;
 use num_format::{Locale, ToFormattedString};
 
 use crate::parser;
-use crate::parser::AllReads;
+use crate::sequence::AllReads;
 
 pub fn process_inputs(path: &PathBuf) {
     let files: Vec<_> = glob(&path.to_string_lossy())

@@ -1,8 +1,11 @@
 //! Heru Handika
 //! 28 December 2020
 //! Read dir for qc
+//! Lisence MIT
+
 mod io;
 mod parser;
+mod sequence;
 
 use std::path::Path;
 

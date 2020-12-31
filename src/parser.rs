@@ -5,68 +5,8 @@ use std::path::{PathBuf};
 
 use flate2::bufread::MultiGzDecoder;
 
-struct SeqReads {
-    seq_len: u32,
-    gc_count: u32,
-    n_count: u32,
-}
-
-impl SeqReads {
-    fn count_reads(reads: &str) -> Self {
-        let mut sq = Self {
-                    seq_len: reads.chars().count() as u32,
-                    gc_count: 0,
-                    n_count: 0,
-                };
-
-        reads.chars().for_each(|base|
-                match base {
-                    'G' | 'g'  => sq.gc_count += 1,
-                    'C' | 'c' => sq.gc_count += 1,
-                    'N' | 'n' => sq.n_count += 1,
-                    _ => (), 
-                });
-        sq                   
-    }
-    
-}
-
-pub struct AllReads {
-    pub seqname: String,
-    pub read_count: u32,
-    pub total_base: u32, 
-    pub min_reads: u32,
-    pub max_reads: u32,
-    pub total_gc: u32,
-    pub gc_content: f64,
-    pub tot_n_count: u32,
-    pub n_content: f64,
-}
-
-impl AllReads {
-    fn count_all_reads(fname: &PathBuf, 
-                    reads: &u32,
-                    vec: &[SeqReads]) -> Self {
-        let mut seq = Self {
-            seqname: fname.file_name()
-                        .unwrap()
-                        .to_string_lossy()
-                        .into_owned(),
-            read_count: *reads,
-            total_base: vec.iter().map(|v| v.seq_len).sum(),
-            min_reads: vec.iter().map(|v| v.seq_len).min().unwrap(),
-            max_reads: vec.iter().map(|v| v.seq_len).max().unwrap(),
-            total_gc: vec.iter().map(|v| v.gc_count).sum(),
-            gc_content: 0.0,
-            tot_n_count: vec.iter().map(|v| v.n_count).sum(),
-            n_content: 0.0,
-        }; 
-        seq.gc_content = seq.total_gc as f64 / seq.total_base as f64;
-        seq.n_content = seq.tot_n_count as f64 / seq.total_base as f64;
-
-        seq
-    } 
-}
+// use crate::seqprocessor;
+use crate::sequence::*;
 
 // Main driver for parsing compressed fastq files.
 pub fn parse_fastq_gz(input: &PathBuf) -> AllReads {
@@ -90,12 +30,12 @@ pub fn parse_fastq_gz(input: &PathBuf) -> AllReads {
         .for_each(|(idx, recs)|
             match idx % 4 {
                 0 => { if !&recs.starts_with('@') {
-                            panic!("{:?} IS INVALID FASTQ. LOOKING FOR @ FOUND {} at line {}",
+                            panic!("{:?} IS INVALID FASTQ. LOOKING FOR '@' FOUND '{}' at line {}",
                                 &input, &recs, &idx + 1);
                         } else { reads += 1 }},
                 1 => sq_per_read.push(SeqReads::count_reads(&recs)), 
                 2 => { if !&recs.starts_with('+') {
-                            panic!("{:?} IS INVALID FASTQ. LOOKING FOR + FOUND {} at line {}",
+                            panic!("{:?} IS INVALID FASTQ. LOOKING FOR '+' FOUND '{}' at line {}",
                                 &input, &recs, &idx + 1);
                     }},
                 3 => (),
@@ -120,14 +60,14 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "\"test_files/invalid.fastq.gz\" IS INVALID FASTQ. LOOKING FOR + FOUND - at line 3")]
+    #[should_panic(expected = "\"test_files/invalid.fastq.gz\" IS INVALID FASTQ. LOOKING FOR '+' FOUND '-' at line 3")]
     fn test_parsing_invplus_panic() {
         let input = PathBuf::from("test_files/invalid.fastq.gz");
         parse_fastq_gz(&input);
     }
 
     #[test]
-    #[should_panic(expected = "\"test_files/invalid2.fastq.gz\" IS INVALID FASTQ. LOOKING FOR @ FOUND Bunomys_chrysocomus at line 9")]
+    #[should_panic(expected = "\"test_files/invalid2.fastq.gz\" IS INVALID FASTQ. LOOKING FOR '@' FOUND 'Bunomys_chrysocomus' at line 9")]
     fn test_parsing_invname_panic() {
         let input = PathBuf::from("test_files/invalid2.fastq.gz");
         parse_fastq_gz(&input);
