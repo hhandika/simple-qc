@@ -1,49 +1,9 @@
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::{self, BufReader, Write};
+use std::io::{BufReader};
 use std::path::{PathBuf};
 
 use flate2::bufread::MultiGzDecoder;
-use num_format::{Locale, ToFormattedString};
-
-// pub fn decompress_fastq(input: &PathBuf) {
-//     let f = File::open(input).unwrap();
-//     let r = BufReader::new(f);
-//     let mut d = MultiGzDecoder::new(r);
-
-//     let mut v = Vec::new();
-//     d.read_to_end(&mut v).unwrap();
-
-//     let s = String::from_utf8_lossy(&v).into_owned();
-    
-//     let res = String::from(s);
-//     let read = res.lines();
-//     let mut reads: u32 = 0;
-//     let mut seq_per_read: Vec<u32> = Vec::new();
-
-//     for (i, recs) in read.enumerate() {
-//         match i % 4 {
-//             0 => {if !&recs.starts_with("@") {
-//                     panic!("Invalid Sequences");
-//                     } else {reads += 1}},
-//             1 => {seq_per_read.push(count_reads(&recs.to_string()))}, 
-//             2 => {if !&recs.starts_with("+") {
-//                 panic!("Invalid Sequences");
-//                 } else {continue}},
-//             3 => continue,
-//             _ => {println!("Invalid fastq"); break},
-//         };
-//     }
-
-//     let seq_len: u32 = seq_per_read.iter().sum();
-//     // let av: f64 = sum / read_size.len() as f64;
-    
-//     println!("\x1b[0;32mFile {:?}\x1b[0m", &input);
-//     println!("No. of Reads: {}", 
-//         &reads.to_formatted_string(&Locale::en));
-//     println!("Sequence length: {} bp\n", 
-//         &seq_len.to_formatted_string(&Locale::en));
-// }
 
 struct SeqReads {
     seq_len: u32,
@@ -71,19 +31,19 @@ impl SeqReads {
     
 }
 
-struct TotSeq {
-    seqname: String,
-    read_count: u32,
-    total_base: u32,
-    min_reads: u32,
-    max_reads: u32,
-    total_gc: u32,
-    gc_content: f64,
-    tot_n_count: u32,
-    n_content: f64,
+pub struct AllReads {
+    pub seqname: String,
+    pub read_count: u32,
+    pub total_base: u32, 
+    pub min_reads: u32,
+    pub max_reads: u32,
+    pub total_gc: u32,
+    pub gc_content: f64,
+    pub tot_n_count: u32,
+    pub n_content: f64,
 }
 
-impl TotSeq {
+impl AllReads {
     fn count_all_reads(fname: &PathBuf, 
                     reads: &u32,
                     vec: &[SeqReads]) -> Self {
@@ -108,45 +68,8 @@ impl TotSeq {
     } 
 }
 
-fn write_results_to_console(all_reads: &TotSeq) {
-    let stdout = io::stdout();
-    let mut buff = io::BufWriter::new(stdout);
-
-    writeln!(buff, "\x1b[0;32mFile {:?}\x1b[0m", &all_reads.seqname).unwrap();
-    writeln!(buff, "No. of reads\t\t: {}", 
-        &all_reads.read_count
-        .to_formatted_string(&Locale::en)).unwrap();
-    
-    writeln!(buff, "Total GC count\t\t: {}", 
-        &all_reads.total_gc
-        .to_formatted_string(&Locale::en)).unwrap();
-    
-    writeln!(buff, "GC-content\t\t: {:.2}", 
-        &all_reads.gc_content).unwrap();
-    
-    writeln!(buff, "Total N count\t\t: {}", 
-        &all_reads.tot_n_count
-        .to_formatted_string(&Locale::en)).unwrap();
-
-    writeln!(buff, "N-content\t\t: {:.4}", 
-        &all_reads.n_content).unwrap();
-
-    writeln!(buff, "Min read length\t\t: {} bp", 
-        &all_reads.min_reads
-        .to_formatted_string(&Locale::en)).unwrap();
-    
-    writeln!(buff, "Max read length\t\t: {} bp", 
-        &all_reads.max_reads
-        .to_formatted_string(&Locale::en)).unwrap();
-
-    writeln!(buff, "Total sequence length\t: {} bp\n", 
-        &all_reads.total_base
-        .to_formatted_string(&Locale::en)).unwrap();
-}
-
-
-//////// STREAMING //////
-pub fn parse_fastq_gz(input: &PathBuf) {
+// Main driver for parsing compressed fastq files.
+pub fn parse_fastq_gz(input: &PathBuf) -> AllReads {
     let f = File::open(input).unwrap();
     let r = BufReader::new(f);
     let d = MultiGzDecoder::new(r);
@@ -178,56 +101,11 @@ pub fn parse_fastq_gz(input: &PathBuf) {
                 _ => panic!("INVALID FASTQ!"),
             });
 
-    let all_reads: TotSeq = TotSeq::count_all_reads(&input, &reads, &sq_per_read);
+    let all_reads: AllReads = AllReads::count_all_reads(&input, &reads, &sq_per_read);
     // writeln!(outbuff, "DONE!");
-    write_results_to_console(&all_reads);
+    all_reads
 }
 
-
-/////// BETTER PARSER --CLEANER //////////////
-// pub fn parse_fastq_gz(input: &PathBuf) {
-//     let f = File::open(input).unwrap();
-//     let r = BufReader::new(f);
-//     let mut d = MultiGzDecoder::new(r);
-
-//     let mut v = Vec::new();
-//     d.read_to_end(&mut v).unwrap();
-//     let s = String::from_utf8_lossy(&v).into_owned();
-    
-//     let seqs = String::from(s);
-//     let mut reads: u32 = 0;
-//     let mut seq_per_read: Vec<u32> = Vec::new();
-
-//     seqs.lines()
-//         .enumerate()
-//         .for_each(|(idx, recs)|
-//             match idx % 4 {
-//                 0 => { if !&recs.starts_with("@") {
-//                         panic!("INVALID FASTQ. LOOKING FOR @ FOUND {} at {}",
-//                                 &recs, &idx + 1);
-//                     } else {reads += 1}},
-//                 1 => {seq_per_read.push(count_reads(&recs.to_string()))}, 
-//                 2 => { if !&recs.starts_with("+") {
-//                         panic!("INVALID FASTQ. LOOKING FOR + FOUND {} at {}",
-//                                 &recs, &idx + 1);
-//                     }},
-//                 3 => (),
-//                 _ => panic!("INVALID FASTQ!"),
-//             });
-
-//     let seq_len: u32 = seq_per_read.iter().sum();
-    
-//     let stdout = io::stdout();
-//     let mut buff = io::BufWriter::new(stdout);
-
-//     writeln!(buff, "\x1b[0;32mFile {:?}\x1b[0m", &input).unwrap();
-//     writeln!(buff, "No. of Reads: {}", 
-//         &reads.to_formatted_string(&Locale::en)).unwrap();
-//     writeln!(buff, "Sequence length: {} bp\n", 
-//         &seq_len.to_formatted_string(&Locale::en)).unwrap();
-// }
-
-//// END HERE ///
 
 #[cfg(test)]
 mod tests {
@@ -272,13 +150,4 @@ mod tests {
         assert_eq!(4, seq_d.gc_count);
     }
     
-    // #[deny(soft_unstable)]
-    // #[bench]
-    // fn bench_fastq_parser_loop(b: &mut Bencher) {
-    //     b.iter(|| {
-    //         let input = PathBuf::from("data/gz_test_exome.fastq.gz");
-    //         decompress_fastq(&input);
-    //     })
-
-    // }
 }

@@ -1,13 +1,11 @@
 //! Heru Handika
 //! 28 December 2020
 //! Read dir for qc
-mod parser;
+mod io;
+pub mod parser;
 
 use std::path::Path;
-use std::time::Instant;
 
-use glob::glob;
-use rayon::prelude::*;
 use clap::{App, Arg};
 // use indicatif::{HumanDuration};
 
@@ -27,30 +25,6 @@ fn main() {
     let files = "*.fastq.gz";
     let path = input.join(files);
 
-    let files: Vec<_> = glob(&path.to_string_lossy())
-        .expect("Failed to read files")
-        .filter_map(|recs| recs.ok()) 
-        .collect();
+    io::process_inputs(&path);
     
-    if files.is_empty() {
-        panic!("Can't find fastq files.")
-    }
-
-    // println!("FOR LOOP PARSER"); // REMOVE AFTER TESTING
-    // let timeit = Instant::now();
-    // files.par_iter()
-    //     .for_each(|entry| {
-    //         parser::decompress_fastq(&entry);
-    //     });
-    // let duration = timeit.elapsed();
-    
-    // println!("CLOSURE PARSER"); // REMOVE AFTER TESTING
-    let timeit = Instant::now();
-    files.par_iter()
-        .for_each(|recs| {
-            parser::parse_fastq_gz(&recs);
-        });
-    let duration = timeit.elapsed();
-
-    println!("Calculation time (Wall): {:?}", &duration);
 }
