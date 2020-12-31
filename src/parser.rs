@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::{BufReader};
+use std::io::{self, BufReader, Write};
 use std::path::{PathBuf};
 
 use flate2::bufread::MultiGzDecoder;
@@ -75,10 +75,11 @@ pub fn parse_fastq_gz(input: &PathBuf) -> AllReads {
     let d = MultiGzDecoder::new(r);
     let buff = BufReader::new(d);
 
-    // let stdout = io::stdout();
-    // let mut outbuff = io::BufWriter::new(stdout);
+    let stdout = io::stdout();
+    let mut outbuff = io::BufWriter::new(stdout);
 
-    // write!(outbuff, "Processing {:?}\t", &input.file_name()).unwrap();
+    write!(outbuff, "Processing {}\t", 
+        &input.file_name().unwrap().to_string_lossy()).unwrap();
 
     let mut reads: u32 = 0;
     let mut sq_per_read: Vec<SeqReads> = Vec::new();
@@ -102,7 +103,7 @@ pub fn parse_fastq_gz(input: &PathBuf) -> AllReads {
             });
 
     let all_reads: AllReads = AllReads::count_all_reads(&input, &reads, &sq_per_read);
-    // writeln!(outbuff, "DONE!");
+    writeln!(outbuff, "\x1b[0;32mDONE!\x1b[0m").unwrap();
     all_reads
 }
 

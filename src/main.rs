@@ -2,7 +2,7 @@
 //! 28 December 2020
 //! Read dir for qc
 mod io;
-pub mod parser;
+mod parser;
 
 use std::path::Path;
 
@@ -10,8 +10,8 @@ use clap::{App, Arg};
 // use indicatif::{HumanDuration};
 
 fn main() {
-    let args = App::new("RealFastQC-Exp")
-        .version("0.1.0-alpha3.5")
+    let args = App::new("simpleQC")
+        .version("0.1.0-alpha1")
         .about("Quickly count gc content from a fasta file.")
         .arg(Arg::with_name("input")
             .help("Fastq file to analyze.")
