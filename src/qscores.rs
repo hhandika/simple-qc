@@ -7,6 +7,7 @@ pub struct QScore {
     pub mean_q: f64,
 }
 
+#[inline(always)]
 fn decode_qscores(q_line: &[u8]) -> Vec<u32> {
     q_line.iter()
         .map(|scr| *scr as u32 - 33)
