@@ -93,23 +93,25 @@ fn write_results_to_console(all_reads: &Summary) {
 
 fn write_to_csv(all_reads: &[Summary]) {
     let outname = "sQC-summary.csv";
-    let output = File::create(outname).unwrap();
+    let output = File::create(outname).
+            expect("FILE EXISTS.");
     let mut line = LineWriter::new(output);
 
-    writeln!(line, "{},{},{},{},{},{},{},{},{}",
-                "Sequence names",
-                "Read counts",
-                "Total sequence length",
-                "GC counts",
-                "GC-content",
-                "N counts",
-                "N-content",
-                "Min read length",
-                "Max read length")
-                .unwrap();
+    writeln!(line, "Sequence names,\
+                Read counts,\
+                Total sequence length\
+                GC counts,\
+                GC-content,\
+                N counts,\
+                N-content,\
+                Min read length,\
+                Max read length,\
+                Mean Q-Score length,\
+                Mean Q-Score").unwrap();
+        
     all_reads.iter()
         .for_each(|seq| {
-            writeln!(line, "{},{},{},{},{},{},{},{},{}", 
+            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{}", 
                 seq.seqname,
                 seq.read_count,
                 seq.total_base,
@@ -118,7 +120,9 @@ fn write_to_csv(all_reads: &[Summary]) {
                 seq.total_n, 
                 seq.n_content,
                 seq.min_reads,
-                seq.max_reads
+                seq.max_reads,
+                seq.mean_qlen,
+                seq.mean_qscores
             ).unwrap();
         });
 
