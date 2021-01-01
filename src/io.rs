@@ -12,7 +12,7 @@ use rayon::prelude::*;
 use num_format::{Locale, ToFormattedString};
 
 use crate::parser;
-use crate::sequence::AllReads;
+use crate::sequence::Summary;
 
 pub fn process_inputs(path: &PathBuf) {
     let files: Vec<_> = glob(&path.to_string_lossy())
@@ -48,7 +48,7 @@ pub fn process_inputs(path: &PathBuf) {
     println!("Execution time: {:?}", &duration);
 }
 
-fn write_results_to_console(all_reads: &AllReads) {
+fn write_results_to_console(all_reads: &Summary) {
     let stdout = io::stdout();
     let mut buff = io::BufWriter::new(stdout);
 
@@ -65,7 +65,7 @@ fn write_results_to_console(all_reads: &AllReads) {
         &all_reads.gc_content).unwrap();
     
     writeln!(buff, "Total N count\t\t: {}", 
-        &all_reads.tot_n_count
+        &all_reads.total_n
         .to_formatted_string(&Locale::en)).unwrap();
 
     writeln!(buff, "N-content\t\t: {:.4}", 
@@ -82,9 +82,16 @@ fn write_results_to_console(all_reads: &AllReads) {
     writeln!(buff, "Total sequence length\t: {} bp\n", 
         &all_reads.total_base
         .to_formatted_string(&Locale::en)).unwrap();
+    
+    writeln!(buff, "\x1b[0;34mQ-Scores:\x1b[0m").unwrap();
+    writeln!(buff, "Mean Q-Score length\t: {:.2}",
+        &all_reads.mean_qlen).unwrap();
+    writeln!(buff, "Mean Q-Scores\t\t: {:.2}\n",
+        &all_reads.mean_qscores).unwrap();
+    
 }
 
-fn write_to_csv(all_reads: &[AllReads]) {
+fn write_to_csv(all_reads: &[Summary]) {
     let outname = "sQC-summary.csv";
     let output = File::create(outname).unwrap();
     let mut line = LineWriter::new(output);
@@ -108,7 +115,7 @@ fn write_to_csv(all_reads: &[AllReads]) {
                 seq.total_base,
                 seq.total_gc, 
                 seq.gc_content,
-                seq.tot_n_count, 
+                seq.total_n, 
                 seq.n_content,
                 seq.min_reads,
                 seq.max_reads

@@ -7,9 +7,10 @@ use flate2::bufread::MultiGzDecoder;
 
 // use crate::seqprocessor;
 use crate::sequence::*;
+use crate::qscores::*;
 
 // Main driver for parsing compressed fastq files.
-pub fn parse_fastq_gz(input: &PathBuf) -> AllReads {
+pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
     let f = File::open(input).unwrap();
     let r = BufReader::new(f);
     let d = MultiGzDecoder::new(r);
@@ -23,6 +24,7 @@ pub fn parse_fastq_gz(input: &PathBuf) -> AllReads {
 
     let mut reads: u32 = 0;
     let mut sq_per_read: Vec<SeqReads> = Vec::new();
+    let mut qscores: Vec<QScore> = Vec::new();
 
     buff.lines()
         .filter_map(|ok| ok.ok())
@@ -38,11 +40,11 @@ pub fn parse_fastq_gz(input: &PathBuf) -> AllReads {
                             panic!("{:?} IS INVALID FASTQ. LOOKING FOR '+' FOUND '{}' at line {}",
                                 &input, &recs, &idx + 1);
                     }},
-                3 => (),
+                3 => qscores.push(QScore::analyze_qscores(&recs.as_bytes())),
                 _ => panic!("INVALID FASTQ!"),
             });
 
-    let all_reads: AllReads = AllReads::count_all_reads(&input, &reads, &sq_per_read);
+    let all_reads: Summary = Summary::count_all_reads(&input, &reads, &sq_per_read, &qscores);
     writeln!(outbuff, "\x1b[0;32mDONE!\x1b[0m").unwrap();
     all_reads
 }
@@ -71,24 +73,6 @@ mod tests {
     fn test_parsing_invname_panic() {
         let input = PathBuf::from("test_files/invalid2.fastq.gz");
         parse_fastq_gz(&input);
-    }
-
-    #[test]
-    fn gc_count() {
-        let a: String = String::from("AA");
-        let b: String = String::from("AAGC");
-        let c: String = String::from("aaAA");
-        let d: String = String::from("aattggcc");
-
-        let seq_a: SeqReads = SeqReads::count_reads(&a);
-        let seq_b: SeqReads = SeqReads::count_reads(&b);
-        let seq_c: SeqReads = SeqReads::count_reads(&c);
-        let seq_d: SeqReads = SeqReads::count_reads(&d);
-
-        assert_eq!(0, seq_a.gc_count);
-        assert_eq!(2, seq_b.gc_count);
-        assert_eq!(0, seq_c.gc_count);
-        assert_eq!(4, seq_d.gc_count);
     }
     
 }
