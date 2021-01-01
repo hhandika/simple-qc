@@ -1,6 +1,6 @@
 [package]
 name = "simple-qc"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Heru Handika <herubiolog@gmail.com>"]
 description = "A quality control cli app for high-throughput sequencing data"
 edition = "2018"
