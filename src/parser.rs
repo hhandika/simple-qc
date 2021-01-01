@@ -37,7 +37,7 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
                                 &input, &recs, &idx + 1);
                         } else { reads += 1 }},
 
-                1 => sq_per_read.push(SeqReads::count_reads(&recs)),
+                1 => sq_per_read.push(SeqReads::count_reads(&recs.as_bytes())),
                 
                 2 => { if !&recs.starts_with('+') {
                             panic!("{:?} IS INVALID FASTQ. \
