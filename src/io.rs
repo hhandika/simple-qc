@@ -99,7 +99,7 @@ fn write_to_csv(all_reads: &[Summary]) {
 
     writeln!(line, "Sequence names,\
                 Read counts,\
-                Total sequence length\
+                Total sequence length,\
                 GC counts,\
                 GC-content,\
                 N counts,\
