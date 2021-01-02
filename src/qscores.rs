@@ -22,7 +22,9 @@ impl QScore {
         let mut q = Self {
                 q_len: q_scores.iter().count() as u32,
                 mean_q: 0.0,
-                low_bases: q_scores.iter().filter(|&x| *x < 20).count() as u32,
+                low_bases: q_scores.iter()
+                                .filter(|&x| *x < 20)
+                                .count() as u32
             };
         
         let sum_q: u32 = q_scores.iter().sum();
