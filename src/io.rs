@@ -75,6 +75,9 @@ fn write_results_to_console(all_reads: &Summary) {
         &all_reads.min_reads
         .to_formatted_string(&Locale::en)).unwrap();
     
+    writeln!(buff, "Mean read length\t: {:.2} bp", 
+        &all_reads.mean_reads).unwrap();
+    
     writeln!(buff, "Max read length\t\t: {} bp", 
         &all_reads.max_reads
         .to_formatted_string(&Locale::en)).unwrap();
@@ -83,11 +86,11 @@ fn write_results_to_console(all_reads: &Summary) {
         &all_reads.total_base
         .to_formatted_string(&Locale::en)).unwrap();
     
-    writeln!(buff, "\x1b[0;34mQ-Scores:\x1b[0m").unwrap();
-    writeln!(buff, "Mean Q-Score length\t: {:.2}",
+    writeln!(buff, "\x1b[0;34mPhred Q-Scores:\x1b[0m").unwrap();
+    writeln!(buff, "Mean Q-Scores\t\t: {:.2}",
+    &all_reads.mean_qscores).unwrap();
+    writeln!(buff, "Mean Q-Score length\t: {:.2}\n",
         &all_reads.mean_qlen).unwrap();
-    writeln!(buff, "Mean Q-Scores\t\t: {:.2}\n",
-        &all_reads.mean_qscores).unwrap();
     
 }
 
