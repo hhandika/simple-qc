@@ -7,6 +7,7 @@ mod io;
 mod parser;
 mod sequence;
 mod qscores;
+mod stats;
 
 use std::path::Path;
 

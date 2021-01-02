@@ -75,12 +75,15 @@ fn write_results_to_console(all_reads: &Summary) {
         &all_reads.min_reads
         .to_formatted_string(&Locale::en)).unwrap();
     
-    writeln!(buff, "Mean read length\t: {:.2} bp", 
-        &all_reads.mean_reads).unwrap();
-    
     writeln!(buff, "Max read length\t\t: {} bp", 
         &all_reads.max_reads
         .to_formatted_string(&Locale::en)).unwrap();
+
+    writeln!(buff, "Mean read length\t: {:.2} bp", 
+        &all_reads.mean_reads).unwrap();
+    
+    writeln!(buff, "Median read length\t: {:.2} bp", 
+        &all_reads.median_reads).unwrap();
 
     writeln!(buff, "Total sequence length\t: {} bp\n", 
         &all_reads.total_base
@@ -109,12 +112,13 @@ fn write_to_csv(all_reads: &[Summary]) {
                 N-content,\
                 Min read length,\
                 Max read length,\
+                Mean read length,\
                 Mean Q-Score length,\
                 Mean Q-Score").unwrap();
         
     all_reads.iter()
         .for_each(|seq| {
-            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{}", 
+            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{}", 
                 seq.seqname,
                 seq.read_count,
                 seq.total_base,
@@ -124,6 +128,7 @@ fn write_to_csv(all_reads: &[Summary]) {
                 seq.n_content,
                 seq.min_reads,
                 seq.max_reads,
+                seq.mean_reads,
                 seq.mean_qlen,
                 seq.mean_qscores
             ).unwrap();

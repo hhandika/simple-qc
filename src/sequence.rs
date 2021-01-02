@@ -4,7 +4,9 @@
 //! Lisence MIT
 
 use std::path::{PathBuf};
+
 use crate::qscores::*;
+use crate::stats::*;
 
 pub struct SeqReads {
     pub seq_len: u32,
@@ -39,6 +41,7 @@ pub struct Summary {
     pub min_reads: u32,
     pub max_reads: u32,
     pub mean_reads: f64,
+    pub median_reads: f64,
     pub total_gc: u32,
     pub gc_content: f64,
     pub total_n: u32,
@@ -51,16 +54,18 @@ impl Summary {
     pub fn count_all_reads(fname: &PathBuf, 
                     reads: &u32,
                     vec: &[SeqReads], qscores: &[QScore]) -> Self {
+        let seq_len = vec.iter().map(|v| v.seq_len).collect::<Vec<_>>();
         let mut seq = Self {
             seqname: fname.file_name()
                         .unwrap()
                         .to_string_lossy()
                         .into_owned(),
             read_count: *reads,
-            total_base: vec.iter().map(|v| v.seq_len).sum(),
-            min_reads: vec.iter().map(|v| v.seq_len).min().unwrap(),
-            max_reads: vec.iter().map(|v| v.seq_len).max().unwrap(),
+            total_base: seq_len.iter().sum(),
+            min_reads: *seq_len.iter().min().unwrap(),
+            max_reads: *seq_len.iter().max().unwrap(),
             mean_reads: 0.0,
+            median_reads: median(&seq_len),
             total_gc: vec.iter().map(|v| v.gc_count).sum(),
             gc_content: 0.0,
             total_n: vec.iter().map(|v| v.n_count).sum(),
@@ -151,6 +156,7 @@ mod tests {
         assert_eq!(0.125, res.n_content);
         assert_eq!(6, res.min_reads);
         assert_eq!(10, res.max_reads);
+        assert_eq!(8.0, res.mean_reads);
         assert_eq!(2.0, res.mean_qlen);
         assert_eq!(40.0, res.mean_qscores);
     }
