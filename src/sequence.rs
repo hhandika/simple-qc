@@ -38,6 +38,7 @@ pub struct Summary {
     pub total_base: u32, 
     pub min_reads: u32,
     pub max_reads: u32,
+    pub mean_reads: f64,
     pub total_gc: u32,
     pub gc_content: f64,
     pub total_n: u32,
@@ -59,6 +60,7 @@ impl Summary {
             total_base: vec.iter().map(|v| v.seq_len).sum(),
             min_reads: vec.iter().map(|v| v.seq_len).min().unwrap(),
             max_reads: vec.iter().map(|v| v.seq_len).max().unwrap(),
+            mean_reads: 0.0,
             total_gc: vec.iter().map(|v| v.gc_count).sum(),
             gc_content: 0.0,
             total_n: vec.iter().map(|v| v.n_count).sum(),
@@ -69,7 +71,8 @@ impl Summary {
 
         seq.gc_content = seq.total_gc as f64 / seq.total_base as f64;
         seq.n_content = seq.total_n as f64 / seq.total_base as f64;
-        
+        seq.mean_reads = seq.total_base as f64 / seq.read_count as f64;
+
         let sum_qscores: f64 = qscores.iter().map(|q| q.mean_q).sum();
         seq.mean_qscores = sum_qscores / seq.read_count as f64;
         let sum_qlen: u32 = qscores.iter().map(|q| q.q_len).sum();
@@ -90,12 +93,14 @@ mod tests {
         let c = String::from("aaAA");
         let d = String::from("aattggcc");
         let e = String::from("aataNctgn");
+        let f = b"aacc";
 
         let seq_a: SeqReads = SeqReads::count_reads(&a.as_bytes());
         let seq_b: SeqReads = SeqReads::count_reads(&b.as_bytes());
         let seq_c: SeqReads = SeqReads::count_reads(&c.as_bytes());
         let seq_d: SeqReads = SeqReads::count_reads(&d.as_bytes());
         let seq_e: SeqReads = SeqReads::count_reads(&e.as_bytes());
+        let seq_f: SeqReads = SeqReads::count_reads(f);
 
         assert_eq!(0, seq_a.gc_count);
         assert_eq!(2, seq_b.gc_count);
@@ -107,6 +112,9 @@ mod tests {
         assert_eq!(8, seq_d.seq_len);
         assert_eq!(2, seq_e.n_count);
         assert_eq!(0, seq_a.n_count);
+        assert_eq!(4, seq_f.seq_len);
+        assert_eq!(2, seq_f.gc_count);
+        assert_eq!(0, seq_f.n_count);
     }
 
     #[test]
