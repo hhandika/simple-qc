@@ -37,7 +37,7 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
                                 &input, &recs, &idx + 1);
                         } else { reads += 1 }},
 
-                1 => sq_per_read.push(SeqReads::count_reads(&recs.as_bytes())),
+                1 => sq_per_read.push(SeqReads::count_reads(&recs.trim().as_bytes())),
                 
                 2 => { if !&recs.starts_with('+') {
                             panic!("{:?} IS INVALID FASTQ. \
@@ -45,7 +45,7 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
                                 &input, &recs, &idx + 1);
                         }},
 
-                3 => qscores.push(QScore::analyze_qscores(&recs.as_bytes())),
+                3 => qscores.push(QScore::analyze_qscores(&recs.trim().as_bytes())),
 
                 _ => panic!("INVALID FASTQ!"),
             });
@@ -84,4 +84,26 @@ mod tests {
         parse_fastq_gz(&input);
     }
     
+    #[test]
+    fn parsing_whitespaced_fastq_gz_test() {
+        let input = PathBuf::from("test_files/whitespace.fastq.gz");
+        let res = parse_fastq_gz(&input);
+
+        assert_eq!(70, res.total_base);
+        assert_eq!(70.0, res.mean_qlen);
+        assert_eq!(32.0, res.mean_qscores);
+    }
+
+    #[test]
+    fn parsing_valid_fastq_qz_test() {
+        let input = PathBuf::from("test_files/valid.fastq.gz");
+        let res = parse_fastq_gz(&input);
+
+        assert_eq!(140, res.total_base);
+        assert_eq!(70.0, res.mean_qlen);
+        assert_eq!(0.0, res.n_content);
+        assert_eq!(64, res.total_gc);
+        assert_eq!(32.0, res.mean_qscores);
+        assert_eq!(70, res.min_reads);
+    }
 }
