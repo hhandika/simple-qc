@@ -34,6 +34,8 @@ impl SeqReads {
     
 }
 
+
+// Add Q-len and low bases
 pub struct Summary {
     pub seqname: String,
     pub read_count: u32,
@@ -129,11 +131,13 @@ mod tests {
         
         let q = QScore {
                 q_len: 2,
-                mean_q: 40.0
+                mean_q: 40.0,
+                low_bases: 0
             };
         let q_two = QScore {
                 q_len: 2,
-                mean_q: 40.0
+                mean_q: 40.0,
+                low_bases: 0
             };
         
         let mut seq: Vec<SeqReads> = Vec::new();

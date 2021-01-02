@@ -5,6 +5,7 @@
 pub struct QScore {
     pub q_len: u32,
     pub mean_q: f64,
+    pub low_bases: u32,
 }
 
 #[inline(always)]
@@ -21,6 +22,7 @@ impl QScore {
         let mut q = Self {
                 q_len: q_scores.iter().count() as u32,
                 mean_q: 0.0,
+                low_bases: q_scores.iter().filter(|&x| *x < 20).count() as u32,
             };
         
         let sum_q: u32 = q_scores.iter().sum();
@@ -38,12 +40,16 @@ mod tests {
 
     #[test]
     fn qscore_test () {
+        let p = String::from("II!)");
         let q = String::from("II");
 
         let q_score = QScore::analyze_qscores(q.as_bytes());
+        let p_score = QScore::analyze_qscores(p.as_bytes());
 
         assert_eq!(2, q_score.q_len);
         assert_eq!(40.0, q_score.mean_q);
+        assert_eq!(0, q_score.low_bases);
+        assert_eq!(2, p_score.low_bases);
     }
 
     #[test]

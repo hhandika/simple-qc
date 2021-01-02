@@ -90,9 +90,9 @@ fn write_results_to_console(all_reads: &Summary) {
         .to_formatted_string(&Locale::en)).unwrap();
     
     writeln!(buff, "\x1b[0;34mPhred Q-Scores:\x1b[0m").unwrap();
-    writeln!(buff, "Mean Q-Scores\t\t: {:.2}",
+    writeln!(buff, "Mean\t\t\t: {:.2}",
     &all_reads.mean_qscores).unwrap();
-    writeln!(buff, "Mean Q-Score length\t: {:.2}\n",
+    writeln!(buff, "Length\t\t\t: {:.2}\n",
         &all_reads.mean_qlen).unwrap();
     
 }
