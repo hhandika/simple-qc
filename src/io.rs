@@ -32,10 +32,13 @@ pub fn process_inputs(path: &PathBuf) {
             s.send(parser::parse_fastq_gz(&recs)).unwrap();
         });
     
-    let all_reads: Vec<_> = receiver.iter().collect();
+    let mut all_reads: Vec<Summary> = receiver.iter().collect();
     
+    all_reads.sort_by(|a, b| a.seqname.cmp(&b.seqname));
+
     println!("\n\x1b[1mResults:\x1b[0m");
-    all_reads.iter()
+    all_reads
+            .iter()
             .for_each(|recs| {
                 write_results_to_console(&recs);
             });
