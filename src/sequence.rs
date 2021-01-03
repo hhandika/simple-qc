@@ -44,6 +44,7 @@ pub struct Summary {
     pub max_reads: u32,
     pub mean_reads: f64,
     pub median_reads: f64,
+    pub sd_reads: f64,
     pub total_gc: u32,
     pub gc_content: f64,
     pub total_n: u32,
@@ -60,7 +61,7 @@ impl Summary {
                             vec: &[SeqReads], 
                             qscores: &[QScore]
         ) -> Self {
-        let seq_len = vec.iter().map(|v| v.seq_len).collect::<Vec<_>>();
+        let seq_len = vec.iter().map(|v| v.seq_len).collect::<Vec<u32>>();
 
         let mut seq = Self {
             seqname: fname.file_name()
@@ -73,6 +74,7 @@ impl Summary {
             max_reads: *seq_len.iter().max().unwrap(),
             mean_reads: 0.0,
             median_reads: median(&seq_len),
+            sd_reads: 0.0,
             total_gc: vec.iter().map(|v| v.gc_count).sum(),
             gc_content: 0.0,
             total_n: vec.iter().map(|v| v.n_count).sum(),
@@ -86,6 +88,7 @@ impl Summary {
         seq.gc_content = seq.total_gc as f64 / seq.total_base as f64;
         seq.n_content = seq.total_n as f64 / seq.total_base as f64;
         seq.mean_reads = seq.total_base as f64 / seq.read_count as f64;
+        seq.sd_reads = stdev(&seq_len, &seq.mean_reads);
 
         let sum_qscores: f64 = qscores.iter().map(|q| q.mean_q).sum();
         seq.mean_qscores = sum_qscores / seq.read_count as f64;

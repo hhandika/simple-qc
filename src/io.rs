@@ -15,7 +15,7 @@ use crate::parser;
 use crate::sequence::Summary;
 
 pub fn process_inputs(path: &PathBuf) {
-    let files: Vec<_> = glob(&path.to_string_lossy())
+    let files: Vec<PathBuf> = glob(&path.to_string_lossy())
         .expect("Failed to read files")
         .filter_map(|recs| recs.ok()) 
         .collect();
@@ -87,6 +87,9 @@ fn write_results_to_console(all_reads: &Summary) {
     
     writeln!(buff, "Median read length\t: {:.2} bp", 
         &all_reads.median_reads).unwrap();
+    
+    writeln!(buff, "Stdev read length\t: {:.2}", 
+        &all_reads.sd_reads).unwrap();
 
     writeln!(buff, "Total sequence length\t: {} bp\n", 
         &all_reads.total_base
@@ -130,12 +133,13 @@ fn write_to_csv(all_reads: &[Summary]) {
                 Min read length,\
                 Max read length,\
                 Mean read length,\
+                Stdev read length,\
                 Mean Q-Score length,\
                 Mean Q-Score").unwrap();
         
     all_reads.iter()
         .for_each(|seq| {
-            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{}", 
+            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
                 seq.seqname,
                 seq.read_count,
                 seq.total_base,
@@ -147,6 +151,7 @@ fn write_to_csv(all_reads: &[Summary]) {
                 seq.max_reads,
                 seq.mean_reads,
                 seq.mean_qscores,
+                seq.sd_reads,
                 seq.sum_low_bases,
                 seq.low_bases_ratio,
             ).unwrap();
