@@ -4,7 +4,7 @@
 use std::time::Instant;
 use std::fs::File;
 use std::io::{self, LineWriter, Write};
-use std::path::{PathBuf};
+use std::path::PathBuf;
 use std::sync::mpsc::channel;
 
 use glob::glob;
@@ -27,7 +27,7 @@ fn glob_dir(path: &str) -> Vec<PathBuf> {
     files
 }
 
-pub fn process_inputs(path: &PathBuf) {
+pub fn par_process_inputs(path: &PathBuf) {
     let files = glob_dir(&path.to_string_lossy());
     
     let (sender, receiver) = channel();
@@ -42,14 +42,7 @@ pub fn process_inputs(path: &PathBuf) {
     
     all_reads.sort_by(|a, b| a.seqname.cmp(&b.seqname));
 
-    println!("\n\x1b[1mResults:\x1b[0m");
-    all_reads
-            .iter()
-            .for_each(|recs| {
-                write_results_to_console(&recs);
-            });
-
-    write_to_csv(&all_reads);
+    write_results(&all_reads);
 
     let duration = timeit.elapsed();
     println!("Total files: {}", all_reads.len());
@@ -57,7 +50,17 @@ pub fn process_inputs(path: &PathBuf) {
     println!("Execution time: {:?}", &duration);
 }
 
-fn write_results_to_console(all_reads: &Summary) {
+fn write_results(results: &[Summary]) {
+    println!("\n\x1b[1mResults:\x1b[0m");
+    results.iter()
+            .for_each(|recs| {
+                    write_to_console(&recs);
+                });
+
+    write_to_csv(results);
+}
+
+fn write_to_console(all_reads: &Summary) {
     let stdout = io::stdout();
     let mut buff = io::BufWriter::new(stdout);
 

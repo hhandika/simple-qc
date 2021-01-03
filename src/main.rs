@@ -30,6 +30,6 @@ fn main() {
     let files = "*.fastq.gz";
     let path = input.join(files);
 
-    io::process_inputs(&path);
+    io::par_process_inputs(&path);
     
 }
