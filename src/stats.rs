@@ -44,9 +44,8 @@ fn dev_mean(vec: &[u32], mean: &f64) -> Vec<f64> {
 fn variance(vec: &[u32], mean: &f64) -> f64 {
     let d_mean = dev_mean(vec, mean);
     let n = vec.len() as f64 - 1.0 ;
-    let var = sum_of_square(&d_mean) / n;
-
-    var
+    
+    sum_of_square(&d_mean) / n
 }
 
 pub fn stdev(vec: &[u32], mean: &f64) -> f64 {
