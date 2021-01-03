@@ -104,7 +104,7 @@ fn write_results_to_console(all_reads: &Summary) {
     if &all_reads.total_base != &all_reads.sum_qlen {
         writeln!(buff, "\x1b[0;33mWARNING!\n\
                         \x1b[3mSome bases may not have Q-score.\n\
-                        Q-score and the sequence length are equal.\
+                        The Q-score length and the sequence length are not equal.\
                         \x1b[0m\n")
                         .unwrap();
     }
