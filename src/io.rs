@@ -14,8 +14,8 @@ use num_format::{Locale, ToFormattedString};
 use crate::parser;
 use crate::sequence::Summary;
 
-pub fn process_inputs(path: &PathBuf) {
-    let files: Vec<PathBuf> = glob(&path.to_string_lossy())
+fn glob_dir(path: &str) -> Vec<PathBuf> {
+    let files: Vec<PathBuf> = glob(path)
         .expect("Failed to read files")
         .filter_map(|recs| recs.ok()) 
         .collect();
@@ -23,6 +23,12 @@ pub fn process_inputs(path: &PathBuf) {
     if files.is_empty() {
         panic!("Can't find fastq files.");
     }
+
+    files
+}
+
+pub fn process_inputs(path: &PathBuf) {
+    let files = glob_dir(&path.to_string_lossy());
     
     let (sender, receiver) = channel();
 
