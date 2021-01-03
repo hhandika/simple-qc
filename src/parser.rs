@@ -90,7 +90,7 @@ mod tests {
         let res = parse_fastq_gz(&input);
 
         assert_eq!(70, res.total_base);
-        assert_eq!(70.0, res.mean_qlen);
+        assert_eq!(0, res.sum_low_bases);
         assert_eq!(32.0, res.mean_qscores);
     }
 
@@ -100,7 +100,7 @@ mod tests {
         let res = parse_fastq_gz(&input);
 
         assert_eq!(140, res.total_base);
-        assert_eq!(70.0, res.mean_qlen);
+        assert_eq!(0, res.sum_low_bases);
         assert_eq!(0.0, res.n_content);
         assert_eq!(64, res.total_gc);
         assert_eq!(32.0, res.mean_qscores);

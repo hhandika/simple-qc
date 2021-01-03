@@ -90,10 +90,25 @@ fn write_results_to_console(all_reads: &Summary) {
         .to_formatted_string(&Locale::en)).unwrap();
     
     writeln!(buff, "\x1b[0;34mPhred Q-Scores:\x1b[0m").unwrap();
+
     writeln!(buff, "Mean\t\t\t: {:.2}",
     &all_reads.mean_qscores).unwrap();
-    writeln!(buff, "Length\t\t\t: {:.2}\n",
-        &all_reads.mean_qlen).unwrap();
+
+    writeln!(buff, "Bases < 20\t\t: {}",
+        &all_reads.sum_low_bases
+        .to_formatted_string(&Locale::en)).unwrap();
+
+    writeln!(buff, "Low Q-score ratio\t: {:.2}\n",
+        &all_reads.low_bases_ratio).unwrap();
+    
+    if &all_reads.total_base != &all_reads.sum_qlen {
+        writeln!(buff, "\x1b[0;33mWARNING!\n\
+                        \x1b[3mSome bases may not have Q-score.\n\
+                        Q-Score length is not the same \
+                        length as the sequence length.\
+                        \x1b[0m\n")
+                        .unwrap();
+    }
     
 }
 
@@ -118,7 +133,7 @@ fn write_to_csv(all_reads: &[Summary]) {
         
     all_reads.iter()
         .for_each(|seq| {
-            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{}", 
+            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{}", 
                 seq.seqname,
                 seq.read_count,
                 seq.total_base,
@@ -129,8 +144,9 @@ fn write_to_csv(all_reads: &[Summary]) {
                 seq.min_reads,
                 seq.max_reads,
                 seq.mean_reads,
-                seq.mean_qlen,
-                seq.mean_qscores
+                seq.mean_qscores,
+                seq.sum_low_bases,
+                seq.low_bases_ratio,
             ).unwrap();
         });
 

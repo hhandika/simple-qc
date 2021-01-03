@@ -48,15 +48,20 @@ pub struct Summary {
     pub gc_content: f64,
     pub total_n: u32,
     pub n_content: f64,
-    pub mean_qlen: f64,
+    pub sum_qlen: u32,
     pub mean_qscores: f64,
+    pub sum_low_bases: u32,
+    pub low_bases_ratio: f64
 }
 
 impl Summary {
     pub fn count_all_reads(fname: &PathBuf, 
-                    reads: &u32,
-                    vec: &[SeqReads], qscores: &[QScore]) -> Self {
+                            reads: &u32,
+                            vec: &[SeqReads], 
+                            qscores: &[QScore]
+        ) -> Self {
         let seq_len = vec.iter().map(|v| v.seq_len).collect::<Vec<_>>();
+
         let mut seq = Self {
             seqname: fname.file_name()
                         .unwrap()
@@ -72,8 +77,10 @@ impl Summary {
             gc_content: 0.0,
             total_n: vec.iter().map(|v| v.n_count).sum(),
             n_content: 0.0,
-            mean_qlen: 0.0,
+            sum_qlen: qscores.iter().map(|q| q.q_len).sum(),
             mean_qscores: 0.0,
+            sum_low_bases: qscores.iter().map(|q| q.low_bases).sum(),
+            low_bases_ratio: 0.0
         }; 
 
         seq.gc_content = seq.total_gc as f64 / seq.total_base as f64;
@@ -82,9 +89,7 @@ impl Summary {
 
         let sum_qscores: f64 = qscores.iter().map(|q| q.mean_q).sum();
         seq.mean_qscores = sum_qscores / seq.read_count as f64;
-        let sum_qlen: u32 = qscores.iter().map(|q| q.q_len).sum();
-        seq.mean_qlen = sum_qlen as f64 / seq.read_count as f64;
-
+        seq.low_bases_ratio = seq.sum_low_bases as f64 / seq.total_base as f64;
         seq
     } 
 }
@@ -161,8 +166,9 @@ mod tests {
         assert_eq!(6, res.min_reads);
         assert_eq!(10, res.max_reads);
         assert_eq!(8.0, res.mean_reads);
-        assert_eq!(2.0, res.mean_qlen);
+        assert_eq!(0, res.sum_low_bases);
         assert_eq!(40.0, res.mean_qscores);
+        assert_eq!(0.0, res.low_bases_ratio);
     }
     
 }
