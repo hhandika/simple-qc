@@ -101,7 +101,7 @@ fn write_results_to_console(all_reads: &Summary) {
     writeln!(buff, "Low Q-score ratio\t: {:.2}\n",
         &all_reads.low_bases_ratio).unwrap();
     
-    if &all_reads.total_base != &all_reads.sum_qlen {
+    if all_reads.total_base != all_reads.sum_qlen {
         writeln!(buff, "\x1b[0;33mWARNING!\n\
                         \x1b[3mSome bases may not have Q-score.\n\
                         The Q-score length and the sequence length are not equal.\
