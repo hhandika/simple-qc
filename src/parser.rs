@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader, Write};
-use std::path::{PathBuf};
+use std::path::PathBuf;
 
 use flate2::bufread::MultiGzDecoder;
 
@@ -34,7 +34,7 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
                 0 => { if !&recs.starts_with('@') {
                             panic!("{:?} IS INVALID FASTQ. \
                                 LOOKING FOR '@' FOUND '{}' at line {}",
-                                &input, &recs, &idx + 1);
+                                input, &recs, &idx + 1);
                         } else { reads += 1 }},
 
                 1 => sq_per_read.push(SeqReads::count_reads(&recs.trim().as_bytes())),
@@ -42,7 +42,7 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
                 2 => { if !&recs.starts_with('+') {
                             panic!("{:?} IS INVALID FASTQ. \
                                 LOOKING FOR '+' FOUND '{}' at line {}",
-                                &input, &recs, &idx + 1);
+                                input, &recs, &idx + 1);
                         }},
 
                 3 => qscores.push(QScore::analyze_qscores(&recs.trim().as_bytes())),
@@ -51,7 +51,7 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
             });
 
     let all_reads = Summary::count_all_reads(
-                        &input, &reads, &sq_per_read, &qscores);
+                        input, &reads, &sq_per_read, &qscores);
     writeln!(outbuff, "\x1b[0;32mDONE!\x1b[0m").unwrap();
     all_reads
 }
