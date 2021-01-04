@@ -5,7 +5,6 @@ use std::path::PathBuf;
 
 use flate2::bufread::MultiGzDecoder;
 
-// use crate::seqprocessor;
 use crate::sequence::*;
 use crate::qscores::*;
 

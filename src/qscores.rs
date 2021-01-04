@@ -11,11 +11,13 @@ pub struct QScore {
 #[inline(always)]
 fn decode_qscores(q_line: &[u8]) -> Vec<u32> {
     q_line.iter()
-        .map(|scr| {if *scr < 75 {
-                        *scr as u32 - 33
-                    } else {
-                        panic!("UNSUPPORTED Q-SCORE ENCODING!");
-                    }})
+        .map(|scr| 
+                { if *scr < 75 {
+                    *scr as u32 - 33
+                } else {
+                    panic!("UNSUPPORTED Q-SCORE ENCODING!");
+                }
+            })
         .collect()
 }
 
