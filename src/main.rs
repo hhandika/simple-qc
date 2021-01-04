@@ -15,8 +15,9 @@ use clap::{App, Arg};
 // use indicatif::{HumanDuration};
 
 fn main() {
+    let version = "0.1.4";
     let args = App::new("simpleQC")
-        .version("0.1.4")
+        .version(version)
         .about("Quickly count gc content from a fasta file.")
         .arg(Arg::with_name("input")
             .help("Fastq file to analyze.")
@@ -30,6 +31,7 @@ fn main() {
     let files = "*.fastq.gz";
     let path = input.join(files);
 
+    println!("Initiating simpleQC v{}...", version);
     io::par_process_inputs(&path);
     
 }

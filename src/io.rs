@@ -82,28 +82,30 @@ fn write_to_console(all_reads: &Summary) {
 
     writeln!(buff, "N-content\t\t: {:.4}", 
         &all_reads.n_content).unwrap();
-
-    writeln!(buff, "Min read length\t\t: {} bp", 
-        &all_reads.min_reads
-        .to_formatted_string(&Locale::en)).unwrap();
     
-    writeln!(buff, "Max read length\t\t: {} bp", 
-        &all_reads.max_reads
-        .to_formatted_string(&Locale::en)).unwrap();
-
-    writeln!(buff, "Mean read length\t: {:.2} bp", 
-        &all_reads.mean_reads).unwrap();
-    
-    writeln!(buff, "Median read length\t: {:.2} bp", 
-        &all_reads.median_reads).unwrap();
-    
-    writeln!(buff, "Stdev read length\t: {:.2}", 
-        &all_reads.sd_reads).unwrap();
-
-    writeln!(buff, "Total sequence length\t: {} bp\n", 
+    writeln!(buff, "Sequence length\t\t: {} bp\n", 
         &all_reads.total_base
         .to_formatted_string(&Locale::en)).unwrap();
     
+    writeln!(buff, "\x1b[0;34mReads:\x1b[0m").unwrap();
+
+    writeln!(buff, "Min\t\t\t: {} bp", 
+        &all_reads.min_reads
+        .to_formatted_string(&Locale::en)).unwrap();
+    
+    writeln!(buff, "Max\t\t\t: {} bp", 
+        &all_reads.max_reads
+        .to_formatted_string(&Locale::en)).unwrap();
+
+    writeln!(buff, "Mean\t\t\t: {:.2} bp", 
+        &all_reads.mean_reads).unwrap();
+    
+    writeln!(buff, "Median\t\t\t: {:.2} bp", 
+        &all_reads.median_reads).unwrap();
+    
+    writeln!(buff, "Stdev\t\t\t: {:.2}\n", 
+        &all_reads.sd_reads).unwrap();
+
     writeln!(buff, "\x1b[0;34mPhred Q-Scores:\x1b[0m").unwrap();
 
     writeln!(buff, "Mean\t\t\t: {:.2}",
