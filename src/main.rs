@@ -17,11 +17,18 @@ mod cli;
 
 // use clap::{App, Arg, AppSettings, SubCommand};
 // use indicatif::{HumanDuration};
+use std::time::Instant;
 
 fn main() {
     let version = "0.1.4";
- 
-    cli::process_fastq_commands(version);
     
+    let timeit = Instant::now();
+
+    cli::process_fastq_commands(version);
+
+    let duration = timeit.elapsed();
+
+    println!("Execution time: {:?}", &duration);
+
 }
 

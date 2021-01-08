@@ -1,7 +1,7 @@
 //! Heru Handika
 //! Module
 //! 
-use std::time::Instant;
+
 use std::fs::File;
 use std::io::{self, LineWriter, Write};
 use std::path::PathBuf;
@@ -27,12 +27,26 @@ fn glob_dir(path: &str) -> Vec<PathBuf> {
     files
 }
 
-pub fn par_process_inputs(path: &PathBuf) {
+fn check_input_file(file: &str) {
+    if !file.ends_with(".fastq.gz") {
+        panic!("INVALID FASTQ!")
+    }
+}
+
+pub fn process_file(file: &PathBuf) {
+    check_input_file(&file.to_str().unwrap());
+    
+    let all_reads = parser::parse_fastq_gz(&file);
+
+    write_to_console(&all_reads);
+}
+
+pub fn par_process_dir(path: &PathBuf) {
     let files = glob_dir(&path.to_string_lossy());
     
     let (sender, receiver) = channel();
 
-    let timeit = Instant::now();
+    
     files.into_par_iter()
         .for_each_with(sender, |s, recs| {
             s.send(parser::parse_fastq_gz(&recs)).unwrap();
@@ -44,10 +58,7 @@ pub fn par_process_inputs(path: &PathBuf) {
 
     write_results(&all_reads);
 
-    let duration = timeit.elapsed();
     println!("Total files: {}", all_reads.len());
-
-    println!("Execution time: {:?}", &duration);
 }
 
 fn write_results(results: &[Summary]) {
@@ -169,4 +180,16 @@ fn write_to_csv(all_reads: &[Summary]) {
         });
 
     println!("Summary results is save as {}", outname);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn check_input_file_test() {
+        let input = "some_fastq.gz";
+        check_input_file(&input);
+    }   
 }

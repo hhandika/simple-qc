@@ -10,7 +10,7 @@ use crate::io;
 
 pub fn process_fastq_commands(version: &str) {
     let args = App::new("simpleQC")
-                .version("0.1.4")
+                .version(version)
                 .about("Quickly count gc content from a fasta file")
                 .author("Heru Handika <hhandi1@lsu.edu>")
                 .setting(AppSettings::SubcommandRequiredElseHelp)
@@ -45,7 +45,7 @@ pub fn process_fastq_commands(version: &str) {
                                 .long("wildcard")
                                 .help("Process a single file")
                                 .conflicts_with_all(&[ "dir", "file","wdir"])
-                                .takes_value(true)
+                                .multiple(true)
                                 .value_name("WILDCARD")
                             )
 
@@ -70,15 +70,18 @@ pub fn process_fastq_commands(version: &str) {
                 let path = input.join(files);
 
                 println!("Initiating simpleQC v{}...", version);
-                io::par_process_inputs(&path);
+                io::par_process_dir(&path);
 
             } else if fastq_matches.is_present("file") {
                 let val = fastq_matches.value_of("file").unwrap();
-                println!("File name {}", &val);
+                let input = PathBuf::from(&val);
+                io::process_file(&input);
 
             } else if fastq_matches.is_present("wildcard") {
-                let val = fastq_matches.value_of("wildcard").unwrap();
-                println!("File name {}", &val);
+                let val: Vec<&str> = fastq_matches.values_of("wildcard")
+                                                .unwrap()
+                                                .collect();
+                println!("{:?}", &val);
                 
             } else if fastq_matches.is_present("wdir") {
                 let val = fastq_matches.value_of("wdir").unwrap();
@@ -88,12 +91,7 @@ pub fn process_fastq_commands(version: &str) {
                 println!("No command provided!");
             }
         }
-        // ("fastq", Some(file_matches)) => {
-        //         if file_matches.is_present("file") {
-        //         let val = file_matches.value_of("file").unwrap();
-        //         println!("File name {}", &val);
-        //     }
-        // }
+        
         _ => unreachable!("No commands!"),
     };
 }
