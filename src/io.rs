@@ -174,6 +174,7 @@ fn write_to_csv(all_reads: &[Summary]) {
                 Min read length,\
                 Max read length,\
                 Mean read length,\
+                Median read length,\
                 Stdev read length,\
                 Mean q-score,\
                 Low base < 20,\
@@ -181,7 +182,7 @@ fn write_to_csv(all_reads: &[Summary]) {
         
     all_reads.iter()
         .for_each(|seq| {
-            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
+            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
                 seq.seqname,
                 seq.read_count,
                 seq.total_base,
@@ -192,8 +193,9 @@ fn write_to_csv(all_reads: &[Summary]) {
                 seq.min_reads,
                 seq.max_reads,
                 seq.mean_reads,
-                seq.mean_qscores,
+                seq.median_reads,
                 seq.sd_reads,
+                seq.mean_qscores,
                 seq.sum_low_bases,
                 seq.low_bases_ratio,
             ).unwrap();
