@@ -62,7 +62,6 @@ pub fn process_fastq_commands(version: &str) {
                             Arg::with_name("nocsv")
                                 .long("nocsv")
                                 .help("Do not save results")
-                                .conflicts_with_all(&[ "dir", "file", "wdir"])
                                 .takes_value(false)
                             )
                     )
