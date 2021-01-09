@@ -34,7 +34,7 @@ pub fn process_fastq_commands(version: &str) {
                                 .long("file")
                                 .help("Process a single file")
                                 .conflicts_with_all(&[ "dir", "wildcard", "wdir"])
-                                .takes_value(true)
+                                .multiple(true)
                                 .value_name("FASTQ FILE")
                             )
 
@@ -71,9 +71,9 @@ pub fn process_fastq_commands(version: &str) {
     match args.subcommand() {
 
         ("fastq", Some(fastq_matches)) => {
-            let mut csv = true;
+            let mut iscsv = true;
             if fastq_matches.is_present("nocsv") {
-                csv = false;
+                iscsv = false;
             }
 
             if fastq_matches.is_present("dir") {
@@ -81,26 +81,33 @@ pub fn process_fastq_commands(version: &str) {
                 let input = PathBuf::from(&val);
                 let files = "*.fastq.gz";
                 let path = input.join(files);
-                io::glob_dir(&path, csv);
+                io::glob_dir(&path, iscsv);
 
             } else if fastq_matches.is_present("file") {
-                let val = fastq_matches.value_of("file").unwrap();
-                let input = PathBuf::from(&val);
-                io::process_file(&input, csv);
+                let val: Vec<&str> = fastq_matches
+                                        .values_of("file")
+                                        .unwrap()
+                                        .collect();
+                let files: Vec<PathBuf> = val.iter()
+                                            .map(PathBuf::from)
+                                            .collect();
+                io::par_process_fastq_gz(&files, false, iscsv);
 
             } else if fastq_matches.is_present("wildcard") {
-                let val: Vec<&str> = fastq_matches.values_of("wildcard")
-                                                .unwrap()
-                                                .collect();
+                let val: Vec<&str> = fastq_matches
+                                        .values_of("wildcard")
+                                        .unwrap()
+                                        .collect();
+
                 let files: Vec<PathBuf> = val.iter()
                                             .map(PathBuf::from)
                                             .collect();
                 let path = false;
-                io::par_process_dir(&files, path, csv);
+                io::par_process_fastq_gz(&files, path, iscsv);
                 
             } else if fastq_matches.is_present("wdir") {
                 let val = fastq_matches.value_of("wdir").unwrap();
-                io::traverse_dir(&val, csv);
+                io::traverse_dir(&val, iscsv);
                 
             } else {
                 println!("No command provided!");

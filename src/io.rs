@@ -15,7 +15,7 @@ use walkdir::{DirEntry, WalkDir};
 use crate::parser;
 use crate::sequence::Summary;
 
-pub fn traverse_dir(path: &str, csv: bool) {
+pub fn traverse_dir(path: &str, iscsv: bool) {
     let files: Vec<DirEntry> = WalkDir::new(path).into_iter()
                                 .filter_map(|recs| recs.ok())
                                 .collect();
@@ -30,30 +30,10 @@ pub fn traverse_dir(path: &str, csv: bool) {
     }
     
     let path = true;
-    par_process_dir(&entries, path, csv);                            
+    par_process_fastq_gz(&entries, path, iscsv);                            
 }
 
-fn check_input_file(file: &str) {
-    if !file.ends_with(".fastq.gz") {
-        panic!("INVALID FASTQ!")
-    }
-}
-
-// For processing a single file. 
-// @params: file path.
-pub fn process_file(file: &PathBuf, csv: bool) {
-    check_input_file(&file.to_str().unwrap());
-    
-    let all_reads = parser::parse_fastq_gz(&file);
-
-    write_to_console(&all_reads);
-
-    if csv {
-        write_file_to_csv(&all_reads, false);
-    }
-}
-
-pub fn glob_dir(path: &PathBuf, csv: bool) {
+pub fn glob_dir(path: &PathBuf, iscsv: bool) {
     let files: Vec<PathBuf> = glob(&path.to_string_lossy())
         .expect("Failed to read files")
         .filter_map(|recs| recs.ok()) 
@@ -63,12 +43,12 @@ pub fn glob_dir(path: &PathBuf, csv: bool) {
         panic!("Can't find fastq files.");
     }
 
-    par_process_dir(&files, false, csv);
+    par_process_fastq_gz(&files, false, iscsv);
 }
 
 // For processing a series of files.
 // Use for directory and wildcard.
-pub fn par_process_dir(files: &[PathBuf], path: bool, csv: bool) {
+pub fn par_process_fastq_gz(files: &[PathBuf], path: bool, iscsv: bool) {
     let (sender, receiver) = channel();
     
     files.into_par_iter()
@@ -81,19 +61,19 @@ pub fn par_process_dir(files: &[PathBuf], path: bool, csv: bool) {
     all_reads.sort_by(|a, b| a.seqname.cmp(&b.seqname));
 
 
-    write_results(&all_reads, path, csv);
+    write_results(&all_reads, path, iscsv);
 
 
     println!("Total files: {}", all_reads.len());
 }
 
-fn write_results(results: &[Summary], path: bool, csv: bool) {
+fn write_results(results: &[Summary], path: bool, iscsv: bool) {
     println!("\n\x1b[1mResults:\x1b[0m");
     results.iter()
             .for_each(|recs| {
                     write_to_console(&recs);
                 });
-    if csv {
+    if iscsv {
         write_dir_to_csv(results, path);
     }
 }
@@ -169,16 +149,6 @@ fn write_to_console(all_reads: &Summary) {
     
 }
 
-fn write_file_to_csv(all_reads: &Summary, path: bool) {
-    let outname = "sQC-summary.csv";
-    let output = File::create(outname).
-            expect("FILE EXISTS.");
-    let mut line = LineWriter::new(output);
-
-    write_csv_header(&mut line, path);
-    write_csv_contents(all_reads, &mut line, path)
-}
-
 fn write_dir_to_csv(all_reads: &[Summary], path: bool) {
     let outname = "sQC-summary.csv";
     let output = File::create(outname).
@@ -241,14 +211,14 @@ fn write_csv_contents<W: Write>(seq: &Summary, line:&mut W, path: bool) {
     ).unwrap();
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
 
-    #[test]
-    #[should_panic]
-    fn check_input_file_test() {
-        let input = "some_fastq.gz";
-        check_input_file(&input);
-    }   
-}
+//     #[test]
+//     #[should_panic]
+//     fn check_input_file_test() {
+//         let input = "some_fastq.gz";
+//         check_input_file(&input);
+//     }   
+// }
