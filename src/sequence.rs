@@ -37,6 +37,7 @@ impl SeqReads {
 
 // Add Q-len and low bases
 pub struct Summary {
+    pub path: String,
     pub seqname: String,
     pub read_count: u32,
     pub total_base: u32, 
@@ -64,10 +65,8 @@ impl Summary {
         let seq_len = vec.iter().map(|v| v.seq_len).collect::<Vec<u32>>();
 
         let mut seq = Self {
-            seqname: fname.file_name()
-                        .unwrap()
-                        .to_string_lossy()
-                        .into_owned(),
+            path: fname.parent().unwrap().to_string_lossy().into_owned(),
+            seqname: fname.file_name().unwrap().to_string_lossy().into_owned(),
             read_count: *reads,
             total_base: seq_len.iter().sum(),
             min_reads: *seq_len.iter().min().unwrap(),

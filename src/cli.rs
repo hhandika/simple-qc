@@ -83,7 +83,7 @@ pub fn process_fastq_commands(version: &str) {
                 let files: Vec<PathBuf> = val.iter()
                                             .map(PathBuf::from)
                                             .collect();
-                io::par_process_dir(&files)
+                io::par_process_dir(&files, false)
                 
             } else if fastq_matches.is_present("wdir") {
                 let val = fastq_matches.value_of("wdir").unwrap();

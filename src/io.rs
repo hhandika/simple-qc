@@ -29,7 +29,7 @@ pub fn traverse_dir(path: &str) {
         }
     }
 
-    par_process_dir(&entries);                            
+    par_process_dir(&entries, true);                            
 }
 
 fn check_input_file(file: &str) {
@@ -58,12 +58,12 @@ pub fn glob_dir(path: &PathBuf) {
         panic!("Can't find fastq files.");
     }
 
-    par_process_dir(&files);
+    par_process_dir(&files, false);
 }
 
 // For processing a series of files.
 // Use for directory and wildcard.
-pub fn par_process_dir(files: &[PathBuf]) {
+pub fn par_process_dir(files: &[PathBuf], path: bool) {
     let (sender, receiver) = channel();
     
     files.into_par_iter()
@@ -75,19 +75,19 @@ pub fn par_process_dir(files: &[PathBuf]) {
     
     all_reads.sort_by(|a, b| a.seqname.cmp(&b.seqname));
 
-    write_results(&all_reads);
+    write_results(&all_reads, path);
 
     println!("Total files: {}", all_reads.len());
 }
 
-fn write_results(results: &[Summary]) {
+fn write_results(results: &[Summary], path: bool) {
     println!("\n\x1b[1mResults:\x1b[0m");
     results.iter()
             .for_each(|recs| {
                     write_to_console(&recs);
                 });
 
-    write_to_csv(results);
+    write_to_csv(results, path);
 }
 
 fn write_to_console(all_reads: &Summary) {
@@ -158,12 +158,15 @@ fn write_to_console(all_reads: &Summary) {
     
 }
 
-fn write_to_csv(all_reads: &[Summary]) {
+fn write_to_csv(all_reads: &[Summary], path: bool) {
     let outname = "sQC-summary.csv";
     let output = File::create(outname).
             expect("FILE EXISTS.");
     let mut line = LineWriter::new(output);
 
+    if path {
+        write!(line, "Path,").unwrap();
+    }
     writeln!(line, "Sequence names,\
                 Read counts,\
                 Total sequence length,\
@@ -182,6 +185,9 @@ fn write_to_csv(all_reads: &[Summary]) {
         
     all_reads.iter()
         .for_each(|seq| {
+            if path {
+                write!(line, "{},", seq.path).unwrap();
+            }
             writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
                 seq.seqname,
                 seq.read_count,
