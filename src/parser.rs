@@ -68,7 +68,7 @@ fn is_gunzipped_fastq(input: &PathBuf) -> bool {
 fn check_input_file(input: &PathBuf) {
     if !is_gunzipped_fastq(&input) {
         panic!("FILE INPUT IS NOT COMPRESSED FASTQ. \
-                IT SHOULD ENDS WITH '.gz'")
+                THE FILE EXTENSION SHOULD BE '.gz'")
     }
 }
 
