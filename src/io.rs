@@ -15,7 +15,7 @@ use walkdir::{DirEntry, WalkDir};
 use crate::parser;
 use crate::sequence::Summary;
 
-pub fn traverse_dir(path: &str) {
+pub fn traverse_dir(path: &str, csv: bool) {
     let files: Vec<DirEntry> = WalkDir::new(path).into_iter()
                                 .filter_map(|recs| recs.ok())
                                 .collect();
@@ -28,8 +28,9 @@ pub fn traverse_dir(path: &str) {
             entries.push(path);
         }
     }
-
-    par_process_dir(&entries, true);                            
+    
+    let path = true;
+    par_process_dir(&entries, path, csv);                            
 }
 
 fn check_input_file(file: &str) {
@@ -40,16 +41,19 @@ fn check_input_file(file: &str) {
 
 // For processing a single file. 
 // @params: file path.
-pub fn process_file(file: &PathBuf) {
+pub fn process_file(file: &PathBuf, csv: bool) {
     check_input_file(&file.to_str().unwrap());
     
     let all_reads = parser::parse_fastq_gz(&file);
 
     write_to_console(&all_reads);
-    write_file_to_csv(&all_reads, false)
+
+    if csv {
+        write_file_to_csv(&all_reads, false);
+    }
 }
 
-pub fn glob_dir(path: &PathBuf) {
+pub fn glob_dir(path: &PathBuf, csv: bool) {
     let files: Vec<PathBuf> = glob(&path.to_string_lossy())
         .expect("Failed to read files")
         .filter_map(|recs| recs.ok()) 
@@ -59,12 +63,12 @@ pub fn glob_dir(path: &PathBuf) {
         panic!("Can't find fastq files.");
     }
 
-    par_process_dir(&files, false);
+    par_process_dir(&files, false, csv);
 }
 
 // For processing a series of files.
 // Use for directory and wildcard.
-pub fn par_process_dir(files: &[PathBuf], path: bool) {
+pub fn par_process_dir(files: &[PathBuf], path: bool, csv: bool) {
     let (sender, receiver) = channel();
     
     files.into_par_iter()
@@ -76,19 +80,22 @@ pub fn par_process_dir(files: &[PathBuf], path: bool) {
     
     all_reads.sort_by(|a, b| a.seqname.cmp(&b.seqname));
 
-    write_results(&all_reads, path);
+
+    write_results(&all_reads, path, csv);
+
 
     println!("Total files: {}", all_reads.len());
 }
 
-fn write_results(results: &[Summary], path: bool) {
+fn write_results(results: &[Summary], path: bool, csv: bool) {
     println!("\n\x1b[1mResults:\x1b[0m");
     results.iter()
             .for_each(|recs| {
                     write_to_console(&recs);
                 });
-
-    write_dir_to_csv(results, path);
+    if csv {
+        write_dir_to_csv(results, path);
+    }
 }
 
 fn write_to_console(all_reads: &Summary) {
@@ -97,7 +104,7 @@ fn write_to_console(all_reads: &Summary) {
     
     writeln!(buff, "\x1b[0;32mFile {:?}\x1b[0m", 
         &all_reads.seqname).unwrap();
-        
+
     writeln!(buff, "No. of reads\t\t: {}", 
         &all_reads.read_count
         .to_formatted_string(&Locale::en)).unwrap();

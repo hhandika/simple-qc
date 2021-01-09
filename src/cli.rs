@@ -26,7 +26,6 @@ pub fn process_fastq_commands(version: &str) {
                                 .conflicts_with_all(&["file", "wildcard", "wdir"])
                                 .takes_value(true)
                                 .value_name("DIR")
-                                // .multiple_values("true"),
                             )
 
                         .arg(
@@ -53,28 +52,42 @@ pub fn process_fastq_commands(version: &str) {
                             Arg::with_name("wdir")
                                 .short("w")
                                 .long("wdir")
-                                .help("Find all files inside dir and process it.")
+                                .help("Find all files inside dir and process it")
                                 .conflicts_with_all(&[ "dir", "file", "wildcard"])
                                 .takes_value(true)
                                 .value_name("PARENT DIR")
+                            )
+                        
+                        .arg(
+                            Arg::with_name("nocsv")
+                                .long("nocsv")
+                                .help("Do not save results")
+                                .conflicts_with_all(&[ "dir", "file", "wdir"])
+                                .takes_value(false)
                             )
                     )
                 .get_matches();
     
     println!("Starting simpleQC v{}...", &version);
     match args.subcommand() {
+
         ("fastq", Some(fastq_matches)) => {
+            let mut csv = true;
+            if fastq_matches.is_present("nocsv") {
+                csv = false;
+            }
+
             if fastq_matches.is_present("dir") {
                 let val = fastq_matches.value_of("dir").unwrap();
                 let input = PathBuf::from(&val);
                 let files = "*.fastq.gz";
                 let path = input.join(files);
-                io::glob_dir(&path);
+                io::glob_dir(&path, csv);
 
             } else if fastq_matches.is_present("file") {
                 let val = fastq_matches.value_of("file").unwrap();
                 let input = PathBuf::from(&val);
-                io::process_file(&input);
+                io::process_file(&input, csv);
 
             } else if fastq_matches.is_present("wildcard") {
                 let val: Vec<&str> = fastq_matches.values_of("wildcard")
@@ -83,11 +96,12 @@ pub fn process_fastq_commands(version: &str) {
                 let files: Vec<PathBuf> = val.iter()
                                             .map(PathBuf::from)
                                             .collect();
-                io::par_process_dir(&files, false)
+                let path = false;
+                io::par_process_dir(&files, path, csv);
                 
             } else if fastq_matches.is_present("wdir") {
                 let val = fastq_matches.value_of("wdir").unwrap();
-                io::traverse_dir(&val);
+                io::traverse_dir(&val, csv);
                 
             } else {
                 println!("No command provided!");
