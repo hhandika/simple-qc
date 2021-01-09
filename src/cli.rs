@@ -68,9 +68,7 @@ pub fn process_fastq_commands(version: &str) {
                 let input = PathBuf::from(&val);
                 let files = "*.fastq.gz";
                 let path = input.join(files);
-
-                println!("Initiating simpleQC v{}...", version);
-                io::par_process_dir(&path);
+                io::glob_dir(&path);
 
             } else if fastq_matches.is_present("file") {
                 let val = fastq_matches.value_of("file").unwrap();
@@ -81,7 +79,10 @@ pub fn process_fastq_commands(version: &str) {
                 let val: Vec<&str> = fastq_matches.values_of("wildcard")
                                                 .unwrap()
                                                 .collect();
-                println!("{:?}", &val);
+                let files: Vec<PathBuf> = val.iter()
+                                            .map(PathBuf::from)
+                                            .collect();
+                io::par_process_dir(&files)
                 
             } else if fastq_matches.is_present("wdir") {
                 let val = fastq_matches.value_of("wdir").unwrap();

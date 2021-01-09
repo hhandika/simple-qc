@@ -23,7 +23,8 @@ fn main() {
     let version = "0.1.4";
     
     let timeit = Instant::now();
-
+    println!("Starting simpleQC v{}...", &version);
+    
     cli::process_fastq_commands(version);
 
     let duration = timeit.elapsed();

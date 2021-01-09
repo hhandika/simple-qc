@@ -14,25 +14,14 @@ use num_format::{Locale, ToFormattedString};
 use crate::parser;
 use crate::sequence::Summary;
 
-fn glob_dir(path: &str) -> Vec<PathBuf> {
-    let files: Vec<PathBuf> = glob(path)
-        .expect("Failed to read files")
-        .filter_map(|recs| recs.ok()) 
-        .collect();
-    
-    if files.is_empty() {
-        panic!("Can't find fastq files.");
-    }
-
-    files
-}
-
 fn check_input_file(file: &str) {
     if !file.ends_with(".fastq.gz") {
         panic!("INVALID FASTQ!")
     }
 }
 
+// For processing a single file. 
+// @params: file path.
 pub fn process_file(file: &PathBuf) {
     check_input_file(&file.to_str().unwrap());
     
@@ -41,11 +30,23 @@ pub fn process_file(file: &PathBuf) {
     write_to_console(&all_reads);
 }
 
-pub fn par_process_dir(path: &PathBuf) {
-    let files = glob_dir(&path.to_string_lossy());
+pub fn glob_dir(path: &PathBuf) {
+    let files: Vec<PathBuf> = glob(&path.to_string_lossy())
+        .expect("Failed to read files")
+        .filter_map(|recs| recs.ok()) 
+        .collect();
     
-    let (sender, receiver) = channel();
+    if files.is_empty() {
+        panic!("Can't find fastq files.");
+    }
 
+    par_process_dir(&files);
+}
+
+// For processing a series of files.
+// Use for directory and wildcard.
+pub fn par_process_dir(files: &[PathBuf]) {
+    let (sender, receiver) = channel();
     
     files.into_par_iter()
         .for_each_with(sender, |s, recs| {
