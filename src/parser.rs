@@ -58,11 +58,11 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
 }
 
 fn is_gunzipped_fastq(input: &PathBuf) -> bool {
-    let mut is_gz = true;
     if input.extension().unwrap() != "gz" {
-        is_gz = false;
+        false
+    } else { 
+        true 
     }
-    is_gz
 }
 
 fn check_input_file(input: &PathBuf) {
