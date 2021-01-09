@@ -175,8 +175,9 @@ fn write_to_csv(all_reads: &[Summary]) {
                 Max read length,\
                 Mean read length,\
                 Stdev read length,\
-                Mean Q-Score length,\
-                Mean Q-Score").unwrap();
+                Mean q-score,\
+                Low base < 20,\
+                Low q-score ratio").unwrap();
         
     all_reads.iter()
         .for_each(|seq| {

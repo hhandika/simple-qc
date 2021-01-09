@@ -1,6 +1,6 @@
 [package]
 name = "simple-qc"
-version = "0.1.4"
+version = "0.1.5" # Change version in the main as well
 authors = ["Heru Handika <herubiolog@gmail.com>"]
 description = "A quality control cli app for high-throughput sequencing data"
 edition = "2018"
