@@ -46,6 +46,7 @@ pub fn process_file(file: &PathBuf) {
     let all_reads = parser::parse_fastq_gz(&file);
 
     write_to_console(&all_reads);
+    write_file_to_csv(&all_reads, false)
 }
 
 pub fn glob_dir(path: &PathBuf) {
@@ -87,13 +88,13 @@ fn write_results(results: &[Summary], path: bool) {
                     write_to_console(&recs);
                 });
 
-    write_to_csv(results, path);
+    write_dir_to_csv(results, path);
 }
 
 fn write_to_console(all_reads: &Summary) {
     let stdout = io::stdout();
     let mut buff = io::BufWriter::new(stdout);
-
+    
     writeln!(buff, "\x1b[0;32mFile {:?}\x1b[0m", &all_reads.seqname).unwrap();
     writeln!(buff, "No. of reads\t\t: {}", 
         &all_reads.read_count
@@ -158,12 +159,33 @@ fn write_to_console(all_reads: &Summary) {
     
 }
 
-fn write_to_csv(all_reads: &[Summary], path: bool) {
+fn write_file_to_csv(all_reads: &Summary, path: bool) {
     let outname = "sQC-summary.csv";
     let output = File::create(outname).
             expect("FILE EXISTS.");
     let mut line = LineWriter::new(output);
 
+    write_csv_header(&mut line, path);
+    write_csv_contents(all_reads, &mut line, path)
+}
+
+fn write_dir_to_csv(all_reads: &[Summary], path: bool) {
+    let outname = "sQC-summary.csv";
+    let output = File::create(outname).
+            expect("FILE EXISTS.");
+    let mut line = LineWriter::new(output);
+
+    write_csv_header(&mut line, path);
+            
+    all_reads.iter()
+        .for_each(|seq| {
+            write_csv_contents(seq, &mut line, path)
+        });
+
+    println!("Summary results is save as {}", outname);
+}
+
+fn write_csv_header<W: Write>(line:&mut W, path: bool) {
     if path {
         write!(line, "Path,").unwrap();
     }
@@ -182,32 +204,29 @@ fn write_to_csv(all_reads: &[Summary], path: bool) {
                 Mean q-score,\
                 Low base < 20,\
                 Low q-score ratio").unwrap();
-        
-    all_reads.iter()
-        .for_each(|seq| {
-            if path {
-                write!(line, "{},", seq.path).unwrap();
-            }
-            writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
-                seq.seqname,
-                seq.read_count,
-                seq.total_base,
-                seq.total_gc, 
-                seq.gc_content,
-                seq.total_n, 
-                seq.n_content,
-                seq.min_reads,
-                seq.max_reads,
-                seq.mean_reads,
-                seq.median_reads,
-                seq.sd_reads,
-                seq.mean_qscores,
-                seq.sum_low_bases,
-                seq.low_bases_ratio,
-            ).unwrap();
-        });
+}
 
-    println!("Summary results is save as {}", outname);
+fn write_csv_contents<W: Write>(seq: &Summary, line:&mut W, path: bool) {
+    if path {
+        write!(line, "{},", seq.path).unwrap();
+    }
+    writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
+        seq.seqname,
+        seq.read_count,
+        seq.total_base,
+        seq.total_gc, 
+        seq.gc_content,
+        seq.total_n, 
+        seq.n_content,
+        seq.min_reads,
+        seq.max_reads,
+        seq.mean_reads,
+        seq.median_reads,
+        seq.sd_reads,
+        seq.mean_qscores,
+        seq.sum_low_bases,
+        seq.low_bases_ratio,
+    ).unwrap();
 }
 
 #[cfg(test)]
