@@ -95,7 +95,9 @@ fn write_to_console(all_reads: &Summary) {
     let stdout = io::stdout();
     let mut buff = io::BufWriter::new(stdout);
     
-    writeln!(buff, "\x1b[0;32mFile {:?}\x1b[0m", &all_reads.seqname).unwrap();
+    writeln!(buff, "\x1b[0;32mFile {:?}\x1b[0m", 
+        &all_reads.seqname).unwrap();
+        
     writeln!(buff, "No. of reads\t\t: {}", 
         &all_reads.read_count
         .to_formatted_string(&Locale::en)).unwrap();
@@ -150,11 +152,12 @@ fn write_to_console(all_reads: &Summary) {
         &all_reads.low_bases_ratio).unwrap();
     
     if all_reads.total_base != all_reads.sum_qlen {
-        writeln!(buff, "\x1b[0;33mWARNING!\n\
-                        \x1b[3mSome bases may not have Q-score.\n\
-                        The Q-score length and the sequence length are not equal.\
-                        \x1b[0m\n")
-                        .unwrap();
+        writeln!(buff, 
+            "\x1b[0;33mWARNING!\n\
+            \x1b[3mSome bases may not have Q-score.\n\
+            The Q-score length and the sequence length are not equal.\
+            \x1b[0m\n")
+            .unwrap();
     }
     
 }
@@ -172,7 +175,7 @@ fn write_file_to_csv(all_reads: &Summary, path: bool) {
 fn write_dir_to_csv(all_reads: &[Summary], path: bool) {
     let outname = "sQC-summary.csv";
     let output = File::create(outname).
-            expect("FILE EXISTS.");
+                    expect("FILE EXISTS.");
     let mut line = LineWriter::new(output);
 
     write_csv_header(&mut line, path);
@@ -189,21 +192,23 @@ fn write_csv_header<W: Write>(line:&mut W, path: bool) {
     if path {
         write!(line, "Path,").unwrap();
     }
-    writeln!(line, "Sequence names,\
-                Read counts,\
-                Total sequence length,\
-                GC counts,\
-                GC-content,\
-                N counts,\
-                N-content,\
-                Min read length,\
-                Max read length,\
-                Mean read length,\
-                Median read length,\
-                Stdev read length,\
-                Mean q-score,\
-                Low base < 20,\
-                Low q-score ratio").unwrap();
+    writeln!(line, 
+        "Sequence names,\
+        Read counts,\
+        Total sequence length,\
+        GC counts,\
+        GC-content,\
+        N counts,\
+        N-content,\
+        Min read length,\
+        Max read length,\
+        Mean read length,\
+        Median read length,\
+        Stdev read length,\
+        Mean q-score,\
+        Low base < 20,\
+        Low q-score ratio")
+        .unwrap();
 }
 
 fn write_csv_contents<W: Write>(seq: &Summary, line:&mut W, path: bool) {

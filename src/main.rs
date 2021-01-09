@@ -10,13 +10,6 @@ mod qscores;
 mod stats;
 mod cli;
 
-// use cli::*;
-// use structopt::StructOpt;
-
-// use std::path::Path;
-
-// use clap::{App, Arg, AppSettings, SubCommand};
-// use indicatif::{HumanDuration};
 use std::time::Instant;
 
 fn main() {
