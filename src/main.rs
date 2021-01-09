@@ -22,12 +22,11 @@ use std::time::Instant;
 fn main() {
     let version = "0.1.4";
     
-    let timeit = Instant::now();
-    println!("Starting simpleQC v{}...", &version);
-    
+    let start_time = Instant::now();
+
     cli::process_fastq_commands(version);
 
-    let duration = timeit.elapsed();
+    let duration = start_time.elapsed();
 
     println!("Execution time: {:?}", &duration);
 

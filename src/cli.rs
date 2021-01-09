@@ -60,7 +60,8 @@ pub fn process_fastq_commands(version: &str) {
                             )
                     )
                 .get_matches();
-
+    
+    println!("Starting simpleQC v{}...", &version);
     match args.subcommand() {
         ("fastq", Some(fastq_matches)) => {
             if fastq_matches.is_present("dir") {
@@ -86,7 +87,7 @@ pub fn process_fastq_commands(version: &str) {
                 
             } else if fastq_matches.is_present("wdir") {
                 let val = fastq_matches.value_of("wdir").unwrap();
-                println!("File name {}", &val);
+                io::traverse_dir(&val);
                 
             } else {
                 println!("No command provided!");

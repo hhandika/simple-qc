@@ -8,11 +8,29 @@ use std::path::PathBuf;
 use std::sync::mpsc::channel;
 
 use glob::glob;
-use rayon::prelude::*;
 use num_format::{Locale, ToFormattedString};
+use rayon::prelude::*;
+use walkdir::{DirEntry, WalkDir};
 
 use crate::parser;
 use crate::sequence::Summary;
+
+pub fn traverse_dir(path: &str) {
+    let files: Vec<DirEntry> = WalkDir::new(path).into_iter()
+                                .filter_map(|recs| recs.ok())
+                                .collect();
+
+    let mut entries: Vec<PathBuf> = Vec::new();
+    for recs in files.into_iter() {
+        let files = String::from(recs.path().to_string_lossy());
+        if files.ends_with(".fastq.gz") {
+            let path = PathBuf::from(files);
+            entries.push(path);
+        }
+    }
+
+    par_process_dir(&entries);                            
+}
 
 fn check_input_file(file: &str) {
     if !file.ends_with(".fastq.gz") {
