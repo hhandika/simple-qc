@@ -46,8 +46,7 @@ pub fn glob_dir(path: &PathBuf, iscsv: bool) {
     par_process_fastq_gz(&files, false, iscsv);
 }
 
-// For processing a series of files.
-// Use for directory and wildcard.
+// Process multiple files in parallel. 
 pub fn par_process_fastq_gz(files: &[PathBuf], path: bool, iscsv: bool) {
     let (sender, receiver) = channel();
     
@@ -74,7 +73,7 @@ fn write_results(results: &[Summary], path: bool, iscsv: bool) {
                     write_to_console(&recs);
                 });
     if iscsv {
-        write_dir_to_csv(results, path);
+        write_to_csv(results, path);
     }
 }
 
@@ -149,7 +148,7 @@ fn write_to_console(all_reads: &Summary) {
     
 }
 
-fn write_dir_to_csv(all_reads: &[Summary], path: bool) {
+fn write_to_csv(all_reads: &[Summary], path: bool) {
     let outname = "sQC-summary.csv";
     let output = File::create(outname).
                     expect("FILE EXISTS.");
