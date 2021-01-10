@@ -1,2 +1,0 @@
-Sequence names,Read counts,Total sequence length,GC counts,GC-content,N counts,N-content,Min read length,Max read length,Mean read length,Median read length,Stdev read length,Mean q-score,Low base < 20,Low q-score ratio
-gz_test_exome.fastq.gz,193538,29224238,15526782,0.5312980957792638,652,0.00002231024808927439,151,151,151,151,0,32.68632537142494,2718782,0.09303174987830307
