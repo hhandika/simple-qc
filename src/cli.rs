@@ -77,33 +77,22 @@ pub fn process_fastq_commands(version: &str) {
             }
 
             if fastq_matches.is_present("dir") {
-                let val = fastq_matches.value_of("dir").unwrap();
-                let input = PathBuf::from(&val);
-                let files = "*.fastq.gz";
-                let path = input.join(files);
-                io::glob_dir(&path, iscsv);
+                let entry: &str = fastq_matches.value_of("dir").unwrap();
+                process_dir(entry, iscsv);
 
             } else if fastq_matches.is_present("file") {
-                let val: Vec<&str> = fastq_matches
+                let entries: Vec<&str> = fastq_matches
                                         .values_of("file")
                                         .unwrap()
                                         .collect();
-                let files: Vec<PathBuf> = val.iter()
-                                            .map(PathBuf::from)
-                                            .collect();
-                io::par_process_fastq_gz(&files, false, iscsv);
+                process_multiple_entries(&entries, iscsv);
 
             } else if fastq_matches.is_present("wildcard") {
-                let val: Vec<&str> = fastq_matches
-                                        .values_of("wildcard")
-                                        .unwrap()
-                                        .collect();
-
-                let files: Vec<PathBuf> = val.iter()
-                                            .map(PathBuf::from)
-                                            .collect();
-                let path = false;
-                io::par_process_fastq_gz(&files, path, iscsv);
+                let entries: Vec<&str> = fastq_matches.values_of("wildcard")
+                                                    .unwrap()
+                                                    .collect();
+                process_multiple_entries(&entries, iscsv);
+                
                 
             } else if fastq_matches.is_present("wdir") {
                 let val = fastq_matches.value_of("wdir").unwrap();
@@ -114,6 +103,23 @@ pub fn process_fastq_commands(version: &str) {
             }
         }
         
-        _ => unreachable!("No commands!"),
+        _ => unreachable!("Unreachable commands!"),
     };
+}
+
+#[inline(always)]
+fn process_dir(entry: &str, iscsv: bool) {
+    let input = PathBuf::from(&entry);
+    let files = "*.fastq.gz";
+    let path = input.join(files);
+    io::glob_dir(&path, iscsv);
+}
+
+#[inline(always)]
+fn process_multiple_entries(entries: &[&str], iscsv: bool) {
+    let files: Vec<PathBuf> = entries.iter()
+                                .map(PathBuf::from)
+                                .collect();
+    let path = false;
+    io::par_process_fastq_gz(&files, path, iscsv);
 }
