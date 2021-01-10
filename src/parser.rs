@@ -57,16 +57,9 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
     all_reads
 }
 
-fn is_gunzipped_fastq(input: &PathBuf) -> bool {
-    if input.extension().unwrap() != "gz" {
-        false
-    } else { 
-        true 
-    }
-}
-
+#[inline(always)]
 fn check_input_file(input: &PathBuf) {
-    if !is_gunzipped_fastq(&input) {
+    if input.extension().unwrap() != "gz" {
         panic!("FILE INPUT IS NOT COMPRESSED FASTQ. \
                 THE FILE EXTENSION SHOULD BE '.gz'")
     }
@@ -121,13 +114,6 @@ mod tests {
         assert_eq!(64, res.total_gc);
         assert_eq!(32.0, res.mean_qscores);
         assert_eq!(70, res.min_reads);
-    }
-
-    #[test]
-    fn check_gunzip_input_test() {
-        let input = PathBuf::from("valid_input.fastq.gz");
-
-        assert_eq!(true, is_gunzipped_fastq(&input));
     }
 
     #[test]
