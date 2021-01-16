@@ -22,6 +22,6 @@ fn main() {
     let duration = start_time.elapsed();
 
     println!("Execution time: {:?}", &duration);
-    println!("\nThank you for using simpleQC! 😊");
+    println!("\nThank you for using simpleQC {}! 😊", &version);
 }
 
