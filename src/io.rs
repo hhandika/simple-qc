@@ -10,27 +10,33 @@ use std::sync::mpsc::channel;
 use glob::glob;
 use num_format::{Locale, ToFormattedString};
 use rayon::prelude::*;
-use walkdir::{DirEntry, WalkDir};
+use walkdir::WalkDir;
 
 use crate::parser;
 use crate::sequence::Summary;
 
 pub fn traverse_dir(path: &str, iscsv: bool) {
-    let files: Vec<DirEntry> = WalkDir::new(path).into_iter()
-                                .filter_map(|recs| recs.ok())
-                                .collect();
-
     let mut entries: Vec<PathBuf> = Vec::new();
-    for recs in files.into_iter() {
-        let files = String::from(recs.path().to_string_lossy());
-        if files.ends_with(".fastq.gz") {
-            let path = PathBuf::from(files);
-            entries.push(path);
-        }
-    }
+
+    WalkDir::new(path).into_iter()
+        .filter_map(|recs| recs.ok())
+        .for_each(|e| {
+            let files = String::from(e.path().to_string_lossy());
+            match_fastq(&files, &mut entries);
+        });
     
     let path = true;
     par_process_fastq_gz(&entries, path, iscsv);                            
+}
+
+fn match_fastq(files: &str, entries: &mut Vec<PathBuf>) {
+    match files {
+        s if s.ends_with(".fastq.gz") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fq.gz") => entries.push(PathBuf::from(files)),
+        s if s.ends_with("fastq.gzip") => entries.push(PathBuf::from(files)),
+        s if s.ends_with("fq.gzip") => entries.push(PathBuf::from(files)),
+        _ => (),
+    };
 }
 
 pub fn glob_dir(path: &PathBuf, iscsv: bool) {
