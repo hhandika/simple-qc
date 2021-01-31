@@ -29,14 +29,18 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
 
     buff.lines()
         .filter_map(|ok| ok.ok())
+        .filter(|recs| !recs.is_empty())
         .enumerate()
-        .for_each(|(idx, recs)|
+        .for_each(|(idx, recs)| {
             match idx % 4 {
-                0 => { if !&recs.starts_with('@') {
-                            panic!("{:?} IS INVALID FASTQ. \
-                                LOOKING FOR '@' FOUND '{}' at line {}",
-                                input, &recs, &idx + 1);
-                        } else { reads += 1 }},
+                0 => { 
+                    if !&recs.starts_with('@') {
+                    panic!("{:?} IS INVALID FASTQ. \
+                        LOOKING FOR '@' FOUND '{}' at line {}",
+                        input, &recs, &idx + 1);
+                } else { 
+                    reads += 1 }
+                },
 
                 1 => sq_per_read.push(SeqReads::count_reads(&recs.trim().as_bytes())),
                 
@@ -49,7 +53,7 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
                 3 => qscores.push(QScore::analyze_qscores(&recs.trim().as_bytes())),
 
                 _ => panic!("INVALID FASTQ!"),
-            });
+        }});
 
     let all_reads = Summary::count_all_reads(
                         input, &reads, &sq_per_read, &qscores);
