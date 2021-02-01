@@ -13,7 +13,7 @@ mod cli;
 use std::time::Instant;
 
 fn main() {
-    let version = "0.1.7"; 
+    let version = "0.2.0"; 
     
     let start_time = Instant::now();
 
