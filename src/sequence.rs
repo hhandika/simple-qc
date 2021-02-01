@@ -26,7 +26,7 @@ impl SeqReads {
     pub fn count_reads(&mut self, reads: &[u8]) {
         reads.iter().for_each(|base|
                 match base {
-                    b'G' | b'g'  => self.gc_count += 1,
+                    b'G' | b'g' => self.gc_count += 1,
                     b'C' | b'c' => self.gc_count += 1,
                     b'N' | b'n' => self.n_count += 1,
                     _ => (), 
@@ -121,6 +121,7 @@ mod tests {
 
         let mut seq_d: SeqReads = SeqReads::new(&d.as_bytes());
         seq_d.count_reads(&d.as_bytes());
+
         let mut seq_e: SeqReads = SeqReads::new(&e.as_bytes());
         seq_e.count_reads(&e.as_bytes());
 
