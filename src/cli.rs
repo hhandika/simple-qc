@@ -89,7 +89,7 @@ pub fn process_fastq_commands(version: &str) {
                 let mut gunzip = true;
 
                 if fastq_matches.is_present("nogz") {
-                    gunzip = true
+                    gunzip = false
                 }
                 process_dir(entry, gunzip, iscsv);
 
@@ -127,7 +127,7 @@ fn process_dir(entry: &str, gunzip: bool, iscsv: bool) {
     if !gunzip {
         files = "*.fastq";
     }
-    
+
     let path = input.join(files);
     io::glob_dir(&path, iscsv);
 }
