@@ -46,7 +46,7 @@ pub fn glob_dir(path: &PathBuf, iscsv: bool) {
         .collect();
     
     if files.is_empty() {
-        panic!("Can't find fastq files.");
+        panic!("Can't find fastq/fastq.gz files.");
     }
 
     par_process_fastq_gz(&files, false, iscsv);
