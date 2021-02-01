@@ -13,7 +13,7 @@ use rayon::prelude::*;
 use walkdir::WalkDir;
 
 use crate::parser;
-use crate::sequence::Summary;
+use crate::sequence::Fastq;
 
 pub fn traverse_dir(path: &str, iscsv: bool) {
     let mut entries: Vec<PathBuf> = Vec::new();
@@ -61,7 +61,7 @@ pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
             s.send(parser::process_fastq(&recs)).unwrap();
         });
     
-    let mut all_reads: Vec<Summary> = receiver.iter().collect();
+    let mut all_reads: Vec<Fastq> = receiver.iter().collect();
     
     all_reads.sort_by(|a, b| a.seqname.cmp(&b.seqname));
 
@@ -72,7 +72,7 @@ pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
     println!("Total files: {}", all_reads.len());
 }
 
-fn write_results(results: &[Summary], path: bool, iscsv: bool) {
+fn write_results(results: &[Fastq], path: bool, iscsv: bool) {
     println!("\n\x1b[1mResults:\x1b[0m");
     results.iter()
             .for_each(|recs| {
@@ -83,7 +83,7 @@ fn write_results(results: &[Summary], path: bool, iscsv: bool) {
     }
 }
 
-fn write_to_console(all_reads: &Summary) {
+fn write_to_console(all_reads: &Fastq) {
     let stdout = io::stdout();
     let mut buff = io::BufWriter::new(stdout);
     
@@ -154,8 +154,8 @@ fn write_to_console(all_reads: &Summary) {
     
 }
 
-fn write_to_csv(all_reads: &[Summary], path: bool) {
-    let outname = "sQC-summary.csv";
+fn write_to_csv(all_reads: &[Fastq], path: bool) {
+    let outname = "sQC-Fastq.csv";
     let output = File::create(outname).
                     expect("FILE EXISTS.");
     let mut line = LineWriter::new(output);
@@ -167,7 +167,7 @@ fn write_to_csv(all_reads: &[Summary], path: bool) {
             write_csv_contents(seq, &mut line, path)
         });
 
-    println!("Summary results is save as {}", outname);
+    println!("Fastq results is save as {}", outname);
 }
 
 fn write_csv_header<W: Write>(line:&mut W, path: bool) {
@@ -193,7 +193,7 @@ fn write_csv_header<W: Write>(line:&mut W, path: bool) {
         .unwrap();
 }
 
-fn write_csv_contents<W: Write>(seq: &Summary, line:&mut W, path: bool) {
+fn write_csv_contents<W: Write>(seq: &Fastq, line:&mut W, path: bool) {
     if path {
         write!(line, "{},", seq.path).unwrap();
     }

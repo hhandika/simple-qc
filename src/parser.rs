@@ -8,7 +8,7 @@ use flate2::bufread::MultiGzDecoder;
 use crate::sequence::*;
 use crate::qscores::*;
 
-pub fn process_fastq(input: &PathBuf) -> Summary {
+pub fn process_fastq(input: &PathBuf) -> Fastq {
     if is_gunzip(input) {
         parse_gunzip_fastq(input)
     } else if is_unzip_fastq(input) {
@@ -32,7 +32,7 @@ fn is_unzip_fastq(input: &PathBuf) -> bool {
     }
 }
 
-fn parse_gunzip_fastq(input: &PathBuf) -> Summary {
+fn parse_gunzip_fastq(input: &PathBuf) -> Fastq {
     let file = File::open(input).unwrap();
     let reader = BufReader::new(file);
     let decompressor = MultiGzDecoder::new(reader);
@@ -41,7 +41,7 @@ fn parse_gunzip_fastq(input: &PathBuf) -> Summary {
     parse_fastq(buff, input)
 }
 
-fn parse_unzip_fastq(input: &PathBuf) -> Summary {
+fn parse_unzip_fastq(input: &PathBuf) -> Fastq {
     let file = File::open(input).unwrap();
     let buff = BufReader::new(file);
     
@@ -49,7 +49,7 @@ fn parse_unzip_fastq(input: &PathBuf) -> Summary {
 }
 
 // Main driver for parsing compressed fastq files.
-fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Summary {
+fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Fastq {
     let stdout = io::stdout();
     let mut outbuff = io::BufWriter::new(stdout);
 
@@ -89,7 +89,7 @@ fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Summary {
                 _ => panic!("INVALID FASTQ!"),
         }});
 
-    let all_reads = Summary::count_all_reads(
+    let all_reads = Fastq::count_all_reads(
         input, &reads, &sq_per_read, &qscores);
         
     writeln!(outbuff, "\x1b[0;32mDONE!\x1b[0m").unwrap();
@@ -152,7 +152,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn panic_invalid_fastq_test() {
-        let input = PathBuf::from("valid_input.csv");
+        let input = PathBuf::from("valid_input.fasta");
         process_fastq(&input);
     }
 

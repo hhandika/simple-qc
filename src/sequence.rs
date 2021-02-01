@@ -36,7 +36,7 @@ impl SeqReads {
 
 
 // Add Q-len and low bases
-pub struct Summary {
+pub struct Fastq {
     pub path: String,
     pub seqname: String,
     pub read_count: u32,
@@ -56,7 +56,7 @@ pub struct Summary {
     pub low_bases_ratio: f64
 }
 
-impl Summary {
+impl Fastq {
     pub fn count_all_reads(fname: &PathBuf, 
                             reads: &u32,
                             vec: &[SeqReads], 
@@ -156,7 +156,7 @@ mod tests {
         let fname = PathBuf::from("data/test.fastq");
         let reads = 2;
 
-        let res = Summary::count_all_reads(&fname, &reads, &seq, &qscores);
+        let res = Fastq::count_all_reads(&fname, &reads, &seq, &qscores);
 
         assert_eq!("test.fastq", res.seqname);
         assert_eq!(2, res.read_count);
