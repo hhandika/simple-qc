@@ -64,6 +64,14 @@ pub fn process_fastq_commands(version: &str) {
                                 .help("Do not save results")
                                 .takes_value(false)
                             )
+                        
+                        .arg(
+                            Arg::with_name("nogz")
+                                .long("nogz")
+                                .help("Unzip fastq input")
+                                .conflicts_with_all(&["file", "wdir", "wildcard"])
+                                .takes_value(false)
+                            )
                     )
                 .get_matches();
     
@@ -78,7 +86,12 @@ pub fn process_fastq_commands(version: &str) {
 
             if fastq_matches.is_present("dir") {
                 let entry: &str = fastq_matches.value_of("dir").unwrap();
-                process_dir(entry, iscsv);
+                let mut gunzip = true;
+
+                if fastq_matches.is_present("nogz") {
+                    gunzip = true
+                }
+                process_dir(entry, gunzip, iscsv);
 
             } else if fastq_matches.is_present("file") {
                 let entries: Vec<&str> = fastq_matches
@@ -108,9 +121,13 @@ pub fn process_fastq_commands(version: &str) {
 }
 
 #[inline(always)]
-fn process_dir(entry: &str, iscsv: bool) {
+fn process_dir(entry: &str, gunzip: bool, iscsv: bool) {
     let input = PathBuf::from(&entry);
-    let files = "*.fastq.gz";
+    let mut files = "*.fastq.gz";
+    if !gunzip {
+        files = "*.fastq";
+    }
+    
     let path = input.join(files);
     io::glob_dir(&path, iscsv);
 }
