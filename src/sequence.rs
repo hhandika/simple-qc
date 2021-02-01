@@ -15,21 +15,22 @@ pub struct SeqReads {
 }
 
 impl SeqReads {
-    pub fn count_reads(reads: &[u8]) -> Self {
-        let mut sq = Self {
-                    seq_len: reads.iter().count() as u32,
-                    gc_count: 0,
-                    n_count: 0,
-                };
+    pub fn new(reads: &[u8]) -> Self {
+        Self {
+            seq_len: reads.iter().count() as u32,
+            gc_count: 0,
+            n_count: 0,
+        }
+    }
 
+    pub fn count_reads(&mut self, reads: &[u8]) {
         reads.iter().for_each(|base|
                 match base {
-                    b'G' | b'g'  => sq.gc_count += 1,
-                    b'C' | b'c' => sq.gc_count += 1,
-                    b'N' | b'n' => sq.n_count += 1,
+                    b'G' | b'g'  => self.gc_count += 1,
+                    b'C' | b'c' => self.gc_count += 1,
+                    b'N' | b'n' => self.n_count += 1,
                     _ => (), 
-                });
-        sq                   
+                });                   
     }
     
 }
@@ -109,12 +110,22 @@ mod tests {
         let e = String::from("aataNctgn");
         let f = b"aacc";
 
-        let seq_a: SeqReads = SeqReads::count_reads(&a.as_bytes());
-        let seq_b: SeqReads = SeqReads::count_reads(&b.as_bytes());
-        let seq_c: SeqReads = SeqReads::count_reads(&c.as_bytes());
-        let seq_d: SeqReads = SeqReads::count_reads(&d.as_bytes());
-        let seq_e: SeqReads = SeqReads::count_reads(&e.as_bytes());
-        let seq_f: SeqReads = SeqReads::count_reads(f);
+        let mut seq_a: SeqReads = SeqReads::new(&a.as_bytes());
+        seq_a.count_reads(&a.as_bytes());
+
+        let mut seq_b: SeqReads = SeqReads::new(&b.as_bytes());
+        seq_b.count_reads(&b.as_bytes());
+
+        let mut seq_c: SeqReads = SeqReads::new(&c.as_bytes());
+        seq_c.count_reads(&c.as_bytes());
+
+        let mut seq_d: SeqReads = SeqReads::new(&d.as_bytes());
+        seq_d.count_reads(&d.as_bytes());
+        let mut seq_e: SeqReads = SeqReads::new(&e.as_bytes());
+        seq_e.count_reads(&e.as_bytes());
+
+        let mut seq_f: SeqReads = SeqReads::new(f);
+        seq_f.count_reads(f);
 
         assert_eq!(0, seq_a.gc_count);
         assert_eq!(2, seq_b.gc_count);
@@ -148,8 +159,13 @@ mod tests {
             };
         
         let mut seq: Vec<SeqReads> = Vec::new();
-        seq.push(SeqReads::count_reads(&a.as_bytes()));
-        seq.push(SeqReads::count_reads(&b.as_bytes()));
+        let mut seq_a = SeqReads::new(&a.as_bytes());
+        seq_a.count_reads(&a.as_bytes());
+        seq.push(seq_a);
+
+        let mut seq_b = SeqReads::new(&b.as_bytes());
+        seq_b.count_reads(&b.as_bytes());
+        seq.push(seq_b);
         
         let qscores: Vec<QScore> = vec![q, q_two];
 

@@ -25,7 +25,7 @@ fn is_gunzip(input: &PathBuf) -> bool {
 
 fn is_unzip_fastq(input: &PathBuf) -> bool {
     let ext = input.extension().unwrap();
-    
+
     ext == "fastq" || ext == "fq"
 }
 
@@ -72,14 +72,18 @@ fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Fastq {
                         reads += 1 }
                     },
 
-                1 => sq_per_read.push(SeqReads::count_reads(&recs.trim().as_bytes())),
+                1 => {
+                    let mut reads = SeqReads::new(&recs.trim().as_bytes());
+                    reads.count_reads(&recs.trim().as_bytes());
+                    sq_per_read.push(reads);
+                }
                 
                 2 => { 
                     if !&recs.starts_with('+') {
                         panic!("{:?} IS INVALID FASTQ. \
                             LOOKING FOR '+' FOUND '{}' at line {}",
                             input, &recs, &idx + 1);
-                    }},
+                }},
 
                 3 => qscores.push(QScore::analyze_qscores(&recs.trim().as_bytes())),
 
@@ -92,9 +96,6 @@ fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Fastq {
     writeln!(outbuff, "\x1b[0;32mDONE!\x1b[0m").unwrap();
     all_reads
 }
-
-
-
 
 #[cfg(test)]
 mod tests {
