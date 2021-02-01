@@ -46,7 +46,7 @@ pub fn glob_dir(path: &PathBuf, iscsv: bool) {
         .collect();
     
     if files.is_empty() {
-        panic!("Can't find fastq/fastq.gz files.");
+        panic!("CAN'T FIND 'fastq'/'fastq.gz' FILES.");
     }
 
     par_process_fastq_gz(&files, false, iscsv);
@@ -58,7 +58,7 @@ pub fn par_process_fastq_gz(files: &[PathBuf], path: bool, iscsv: bool) {
     
     files.into_par_iter()
         .for_each_with(sender, |s, recs| {
-            s.send(parser::parse_fastq_gz(&recs)).unwrap();
+            s.send(parser::process_fastq(&recs)).unwrap();
         });
     
     let mut all_reads: Vec<Summary> = receiver.iter().collect();
