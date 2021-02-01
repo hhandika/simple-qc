@@ -11,8 +11,24 @@ use crate::qscores::*;
 pub fn process_fastq(input: &PathBuf) -> Summary {
     if is_gunzip(input) {
         parse_gunzip_fastq(input)
-    } else {
+    } else if is_unzip_fastq(input) {
         parse_unzip_fastq(input)
+    } else {
+        panic!("INVALID FASTQ.");
+    }
+}
+
+#[inline(always)]
+fn is_gunzip(input: &PathBuf) -> bool {
+    input.extension().unwrap() == "gz"
+}
+
+fn is_unzip_fastq(input: &PathBuf) -> bool {
+    let ext = input.extension().unwrap();
+    if ext == "fastq" || ext == "fq" {
+        true
+    } else {
+        false
     }
 }
 
@@ -51,21 +67,22 @@ fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Summary {
         .for_each(|(idx, recs)| {
             match idx % 4 {
                 0 => { 
-                        if !&recs.starts_with('@') {
-                        panic!("{:?} IS INVALID FASTQ. \
-                            LOOKING FOR '@' FOUND '{}' at line {}",
-                            input, &recs, &idx + 1);
+                    if !&recs.starts_with('@') {
+                    panic!("{:?} IS INVALID FASTQ. \
+                        LOOKING FOR '@' FOUND '{}' at line {}",
+                        input, &recs, &idx + 1);
                     } else { 
                         reads += 1 }
                     },
 
                 1 => sq_per_read.push(SeqReads::count_reads(&recs.trim().as_bytes())),
                 
-                2 => { if !&recs.starts_with('+') {
-                            panic!("{:?} IS INVALID FASTQ. \
-                                LOOKING FOR '+' FOUND '{}' at line {}",
-                                input, &recs, &idx + 1);
-                        }},
+                2 => { 
+                    if !&recs.starts_with('+') {
+                        panic!("{:?} IS INVALID FASTQ. \
+                            LOOKING FOR '+' FOUND '{}' at line {}",
+                            input, &recs, &idx + 1);
+                    }},
 
                 3 => qscores.push(QScore::analyze_qscores(&recs.trim().as_bytes())),
 
@@ -73,15 +90,13 @@ fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Summary {
         }});
 
     let all_reads = Summary::count_all_reads(
-                        input, &reads, &sq_per_read, &qscores);
+        input, &reads, &sq_per_read, &qscores);
+        
     writeln!(outbuff, "\x1b[0;32mDONE!\x1b[0m").unwrap();
     all_reads
 }
 
-#[inline(always)]
-fn is_gunzip(input: &PathBuf) -> bool {
-    input.extension().unwrap() == "gz"
-}
+
 
 
 #[cfg(test)]
@@ -134,10 +149,33 @@ mod tests {
         assert_eq!(70, res.min_reads);
     }
 
-    // #[test]
-    // #[should_panic]
-    // fn panic_gunzip_input_test() {
-    //     let input = PathBuf::from("valid_input.fastq");
-    //     check_input_file(&input);
-    // }
+    #[test]
+    #[should_panic]
+    fn panic_invalid_fastq_test() {
+        let input = PathBuf::from("valid_input.csv");
+        process_fastq(&input);
+    }
+
+    #[test]
+    fn is_gunzip_fastq_test() {
+        let input = PathBuf::from("valid_input.fastq.gz");
+        assert_eq!(true, is_gunzip(&input));
+    }
+
+    #[test]
+    fn is_unzip_fastq_test() {
+        let fastq_gz = PathBuf::from("valid_input.fastq.gz");
+        let fastq = PathBuf::from("valid_input.fastq");
+        let fq = PathBuf::from("valid_input.fq");
+
+        assert_eq!(false, is_unzip_fastq(&fastq_gz));
+        assert_eq!(true, is_unzip_fastq(&fastq));
+        assert_eq!(true, is_unzip_fastq(&fq));
+    }
+
+    #[test]
+    fn is_unzip_fastq_panic_test() {
+        let invalid = PathBuf::from("invalid_input.fasta");
+        assert_eq!(false, is_unzip_fastq(&invalid));
+    }
 }
