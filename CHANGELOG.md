@@ -1,4 +1,8 @@
-Upcoming
+0.2.1
+    - Fix Fastq checking issues.
+    - Performance improvement.
+
+0.2.0
     - Allow unzipped fastq files.
     
 0.1.7
