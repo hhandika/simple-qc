@@ -8,15 +8,32 @@ use flate2::bufread::MultiGzDecoder;
 use crate::sequence::*;
 use crate::qscores::*;
 
+pub fn process_fastq(input: &PathBuf) -> Summary {
+    if is_gunzip(input) {
+        parse_gunzip_fastq(input)
+    } else {
+        parse_unzip_fastq(input)
+    }
+}
+
+fn parse_gunzip_fastq(input: &PathBuf) -> Summary {
+    let file = File::open(input).unwrap();
+    let reader = BufReader::new(file);
+    let decompressor = MultiGzDecoder::new(reader);
+    let buff = BufReader::new(decompressor);
+
+    parse_fastq(buff, input)
+}
+
+fn parse_unzip_fastq(input: &PathBuf) -> Summary {
+    let file = File::open(input).unwrap();
+    let buff = BufReader::new(file);
+    
+    parse_fastq(buff, input)
+}
+
 // Main driver for parsing compressed fastq files.
-pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
-    check_input_file(&input);
-
-    let f = File::open(input).unwrap();
-    let r = BufReader::new(f);
-    let d = MultiGzDecoder::new(r);
-    let buff = BufReader::new(d);
-
+fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Summary {
     let stdout = io::stdout();
     let mut outbuff = io::BufWriter::new(stdout);
 
@@ -34,13 +51,13 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
         .for_each(|(idx, recs)| {
             match idx % 4 {
                 0 => { 
-                    if !&recs.starts_with('@') {
-                    panic!("{:?} IS INVALID FASTQ. \
-                        LOOKING FOR '@' FOUND '{}' at line {}",
-                        input, &recs, &idx + 1);
-                } else { 
-                    reads += 1 }
-                },
+                        if !&recs.starts_with('@') {
+                        panic!("{:?} IS INVALID FASTQ. \
+                            LOOKING FOR '@' FOUND '{}' at line {}",
+                            input, &recs, &idx + 1);
+                    } else { 
+                        reads += 1 }
+                    },
 
                 1 => sq_per_read.push(SeqReads::count_reads(&recs.trim().as_bytes())),
                 
@@ -62,11 +79,8 @@ pub fn parse_fastq_gz(input: &PathBuf) -> Summary {
 }
 
 #[inline(always)]
-fn check_input_file(input: &PathBuf) {
-    if input.extension().unwrap() != "gz" {
-        panic!("FILE INPUT IS NOT COMPRESSED FASTQ. \
-                THE FILE EXTENSION SHOULD BE '.gz'")
-    }
+fn is_gunzip(input: &PathBuf) -> bool {
+    input.extension().unwrap() == "gz"
 }
 
 
@@ -78,7 +92,7 @@ mod tests {
     #[should_panic]
     fn test_parsing_all_panic() {
         let input = PathBuf::from("test_files/invalid_fastq.fastq.gz");
-        parse_fastq_gz(&input);
+        parse_gunzip_fastq(&input);
     }
 
     #[test]
@@ -86,7 +100,7 @@ mod tests {
                                 LOOKING FOR '+' FOUND '-' at line 3")]
     fn test_parsing_invplus_panic() {
         let input = PathBuf::from("test_files/invalid.fastq.gz");
-        parse_fastq_gz(&input);
+        parse_gunzip_fastq(&input);
     }
 
     #[test]
@@ -94,13 +108,13 @@ mod tests {
                                 LOOKING FOR '@' FOUND 'Bunomys_chrysocomus' at line 9")]
     fn test_parsing_invname_panic() {
         let input = PathBuf::from("test_files/invalid2.fastq.gz");
-        parse_fastq_gz(&input);
+        parse_gunzip_fastq(&input);
     }
     
     #[test]
     fn parsing_whitespaced_fastq_gz_test() {
         let input = PathBuf::from("test_files/whitespace.fastq.gz");
-        let res = parse_fastq_gz(&input);
+        let res = parse_gunzip_fastq(&input);
 
         assert_eq!(70, res.total_base);
         assert_eq!(0, res.sum_low_bases);
@@ -110,7 +124,7 @@ mod tests {
     #[test]
     fn parsing_valid_fastq_qz_test() {
         let input = PathBuf::from("test_files/valid.fastq.gz");
-        let res = parse_fastq_gz(&input);
+        let res = parse_gunzip_fastq(&input);
 
         assert_eq!(140, res.total_base);
         assert_eq!(0, res.sum_low_bases);
@@ -120,10 +134,10 @@ mod tests {
         assert_eq!(70, res.min_reads);
     }
 
-    #[test]
-    #[should_panic]
-    fn panic_gunzip_input_test() {
-        let input = PathBuf::from("valid_input.fastq");
-        check_input_file(&input);
-    }
+    // #[test]
+    // #[should_panic]
+    // fn panic_gunzip_input_test() {
+    //     let input = PathBuf::from("valid_input.fastq");
+    //     check_input_file(&input);
+    // }
 }
