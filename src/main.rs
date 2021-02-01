@@ -4,7 +4,7 @@
 //! Lisence MIT
 
 mod io;
-mod parser;
+mod fastq;
 mod sequence;
 mod qscores;
 mod stats;

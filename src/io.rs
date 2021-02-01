@@ -12,7 +12,7 @@ use num_format::{Locale, ToFormattedString};
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
-use crate::parser;
+use crate::fastq;
 use crate::sequence::Fastq;
 
 pub fn traverse_dir(path: &str, iscsv: bool) {
@@ -58,7 +58,7 @@ pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
     
     files.into_par_iter()
         .for_each_with(sender, |s, recs| {
-            s.send(parser::process_fastq(&recs)).unwrap();
+            s.send(fastq::process_fastq(&recs)).unwrap();
         });
     
     let mut all_reads: Vec<Fastq> = receiver.iter().collect();
