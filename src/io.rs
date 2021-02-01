@@ -1,5 +1,5 @@
 //! Heru Handika
-//! Module
+//! Module to process user inputs.
 //! 
 
 use std::fs::File;
@@ -63,21 +63,19 @@ pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
     
     let mut all_reads: Vec<Fastq> = receiver.iter().collect();
     
-    all_reads.sort_by(|a, b| a.seqname.cmp(&b.seqname));
-
-
-    write_results(&all_reads, path, iscsv);
-
-
-    println!("Total files: {}", all_reads.len());
+    write_results(&mut all_reads, path, iscsv);
 }
 
-fn write_results(results: &[Fastq], path: bool, iscsv: bool) {
+fn write_results(results: &mut [Fastq], path: bool, iscsv: bool) {
+    results.sort_by(|a, b| a.seqname.cmp(&b.seqname));
     println!("\n\x1b[1mResults:\x1b[0m");
     results.iter()
             .for_each(|recs| {
                     write_to_console(&recs);
                 });
+    
+    println!("Total files: {}", results.len());
+
     if iscsv {
         write_to_csv(results, path);
     }
