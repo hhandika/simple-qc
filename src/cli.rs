@@ -138,5 +138,5 @@ fn process_multiple_entries(entries: &[&str], iscsv: bool) {
                                 .map(PathBuf::from)
                                 .collect();
     let path = false;
-    io::par_process_fastq_gz(&files, path, iscsv);
+    io::par_process_fastq(&files, path, iscsv);
 }

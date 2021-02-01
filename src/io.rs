@@ -26,7 +26,7 @@ pub fn traverse_dir(path: &str, iscsv: bool) {
         });
     
     let path = true;
-    par_process_fastq_gz(&entries, path, iscsv);                            
+    par_process_fastq(&entries, path, iscsv);                            
 }
 
 fn match_fastq(files: &str, entries: &mut Vec<PathBuf>) {
@@ -49,11 +49,11 @@ pub fn glob_dir(path: &PathBuf, iscsv: bool) {
         panic!("CAN'T FIND 'fastq'/'fastq.gz' FILES.");
     }
 
-    par_process_fastq_gz(&files, false, iscsv);
+    par_process_fastq(&files, false, iscsv);
 }
 
 // Process multiple files in parallel. 
-pub fn par_process_fastq_gz(files: &[PathBuf], path: bool, iscsv: bool) {
+pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
     let (sender, receiver) = channel();
     
     files.into_par_iter()
