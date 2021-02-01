@@ -25,11 +25,8 @@ fn is_gunzip(input: &PathBuf) -> bool {
 
 fn is_unzip_fastq(input: &PathBuf) -> bool {
     let ext = input.extension().unwrap();
-    if ext == "fastq" || ext == "fq" {
-        true
-    } else {
-        false
-    }
+    
+    ext == "fastq" || ext == "fq"
 }
 
 fn parse_gunzip_fastq(input: &PathBuf) -> Fastq {
