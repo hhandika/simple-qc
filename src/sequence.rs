@@ -54,7 +54,8 @@ pub struct Fastq {
     pub sum_qlen: u32,
     pub mean_qscores: f64,
     pub sum_low_bases: u32,
-    pub low_bases_ratio: f64
+    pub low_bases_ratio: f64,
+    sum_qscores: f64,
 }
 
 impl Fastq {
@@ -72,29 +73,53 @@ impl Fastq {
             total_base: seq_len.iter().sum(),
             min_reads: *seq_len.iter().min().unwrap(),
             max_reads: *seq_len.iter().max().unwrap(),
-            mean_reads: 0.0,
             median_reads: median(&seq_len),
-            sd_reads: 0.0,
             total_gc: vec.iter().map(|v| v.gc_count).sum(),
-            gc_content: 0.0,
             total_n: vec.iter().map(|v| v.n_count).sum(),
-            n_content: 0.0,
             sum_qlen: qscores.iter().map(|q| q.q_len).sum(),
-            mean_qscores: 0.0,
             sum_low_bases: qscores.iter().map(|q| q.low_bases).sum(),
+            sum_qscores: qscores.iter().map(|q| q.mean_q).sum(),
+            mean_reads: 0.0,
+            sd_reads: 0.0,
+            gc_content: 0.0,
+            n_content: 0.0,
+            mean_qscores: 0.0,
             low_bases_ratio: 0.0
         }; 
 
-        seq.gc_content = seq.total_gc as f64 / seq.total_base as f64;
-        seq.n_content = seq.total_n as f64 / seq.total_base as f64;
-        seq.mean_reads = seq.total_base as f64 / seq.read_count as f64;
-        seq.sd_reads = stdev(&seq_len, &seq.mean_reads);
+        seq.gc_content();
+        seq.n_content();
+        seq.mean_seq();
+        seq.stdev(&seq_len);
+        seq.mean_q();
+        seq.low_bases();
 
-        let sum_qscores: f64 = qscores.iter().map(|q| q.mean_q).sum();
-        seq.mean_qscores = sum_qscores / seq.read_count as f64;
-        seq.low_bases_ratio = seq.sum_low_bases as f64 / seq.total_base as f64;
         seq
-    } 
+    }
+    
+    fn gc_content(&mut self) {
+        self.gc_content = self.total_gc as f64 / self.total_base as f64;
+    }
+
+    fn n_content(&mut self) {
+        self.n_content = self.total_n as f64 / self.total_base as f64;
+    }
+
+    fn mean_seq(&mut self) {
+        self.mean_reads = self.total_base as f64 / self.read_count as f64;
+    }
+
+    fn stdev(&mut self, seq_len: &[u32]) {
+        self.sd_reads = stdev(&seq_len, &self.mean_reads);
+    }
+
+    fn mean_q(&mut self) {
+        self.mean_qscores = self.sum_qscores / self.read_count as f64;
+    }
+
+    fn low_bases(&mut self) {
+        self.low_bases_ratio = self.sum_low_bases as f64 / self.total_base as f64;
+    }
 }
 
 #[cfg(test)]
@@ -151,12 +176,14 @@ mod tests {
         let q = QScore {
                 q_len: 2,
                 mean_q: 40.0,
-                low_bases: 0
+                low_bases: 0,
+                sum: 40,
             };
         let q_two = QScore {
                 q_len: 2,
                 mean_q: 40.0,
-                low_bases: 0
+                low_bases: 0,
+                sum: 40
             };
         
         let mut seq: Vec<SeqReads> = Vec::new();
