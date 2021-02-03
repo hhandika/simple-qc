@@ -73,8 +73,7 @@ fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Fastq {
                     },
 
                 1 => {
-                    let mut reads = SeqReads::new(&recs.trim().as_bytes());
-                    reads.count_reads(&recs.trim().as_bytes());
+                    let reads = SeqReads::get_seq_stats(&recs.trim().as_bytes());
                     sq_per_read.push(reads);
                 }
                 
