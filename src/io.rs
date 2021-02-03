@@ -19,7 +19,8 @@ pub fn traverse_dir(path: &str, iscsv: bool) {
     let mut entries: Vec<PathBuf> = Vec::new();
 
     WalkDir::new(path).into_iter()
-        .filter_map(|recs| recs.ok())
+        .filter_map(|ok| ok.ok())
+        .filter(|e| e.file_type().is_file())
         .for_each(|e| {
             let files = String::from(e.path().to_string_lossy());
             match_fastq(&files, &mut entries);
