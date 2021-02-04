@@ -3,7 +3,7 @@
 //! Modules to process sequencing data
 //! Lisence MIT
 
-use std::path::{PathBuf};
+use std::path::PathBuf;
 
 use crate::qscores::*;
 use crate::stats::*;
