@@ -1,3 +1,7 @@
+0.2.2
+    - The program now can handle over 150 Gb sequence length
+    - Allow unzip support for directory traversal option.
+
 0.2.1
     - Fix Fastq checking issues.
     - Performance improvement.
