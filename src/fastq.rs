@@ -45,7 +45,6 @@ fn parse_unzip_fastq(input: &PathBuf) -> Fastq {
     parse_fastq(buff, input)
 }
 
-// Main driver for parsing compressed fastq files.
 fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Fastq {
     let stdout = io::stdout();
     let mut outbuff = io::BufWriter::new(stdout);
