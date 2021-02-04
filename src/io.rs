@@ -36,6 +36,8 @@ fn match_fastq(files: &str, entries: &mut Vec<PathBuf>) {
         s if s.ends_with(".fq.gz") => entries.push(PathBuf::from(files)),
         s if s.ends_with("fastq.gzip") => entries.push(PathBuf::from(files)),
         s if s.ends_with("fq.gzip") => entries.push(PathBuf::from(files)),
+        s if s.ends_with("fastq") => entries.push(PathBuf::from(files)),
+        s if s.ends_with("fq") => entries.push(PathBuf::from(files)),
         _ => (),
     };
 }
