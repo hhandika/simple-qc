@@ -12,22 +12,34 @@ use num_format::{Locale, ToFormattedString};
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
+use crate::fasta;
 use crate::fastq;
-use crate::sequence::Fastq;
+use crate::sequence::{Fastq, Fasta};
 
-pub fn traverse_dir(path: &str, iscsv: bool) {
+pub fn traverse_dir(path: &str, iscsv: bool, fastq: bool) {
     let mut entries: Vec<PathBuf> = Vec::new();
 
     WalkDir::new(path).into_iter()
         .filter_map(|ok| ok.ok())
         .filter(|e| e.file_type().is_file())
         .for_each(|e| {
-            let files = String::from(e.path().to_string_lossy());
-            match_fastq(&files, &mut entries);
+            if fastq {
+                let files = String::from(e.path().to_string_lossy());
+                match_fastq(&files, &mut entries);
+            } else { // then it is fasta
+                let files = String::from(e.path().to_string_lossy());
+                match_fasta(&files, &mut entries);
+            }
+            
         });
     
-    let path = true;
-    par_process_fastq(&entries, path, iscsv);                            
+    if fastq {
+        let path = true;
+        par_process_fastq(&entries, path, iscsv);   
+    } else {
+        par_process_fasta(&entries);
+    }
+                         
 }
 
 fn match_fastq(files: &str, entries: &mut Vec<PathBuf>) {
@@ -38,6 +50,19 @@ fn match_fastq(files: &str, entries: &mut Vec<PathBuf>) {
         s if s.ends_with("fq.gzip") => entries.push(PathBuf::from(files)),
         s if s.ends_with("fastq") => entries.push(PathBuf::from(files)),
         s if s.ends_with("fq") => entries.push(PathBuf::from(files)),
+        _ => (),
+    };
+}
+
+fn match_fasta(files: &str, entries: &mut Vec<PathBuf>) {
+    match files {
+        s if s.ends_with(".fasta.gz") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fas.gz") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fasta.gzip") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fs.gzip") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fasta") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fas") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fs") => entries.push(PathBuf::from(files)),
         _ => (),
     };
 }
@@ -55,7 +80,7 @@ pub fn glob_dir(path: &PathBuf, iscsv: bool) {
     par_process_fastq(&files, false, iscsv);
 }
 
-// Process multiple files in parallel. 
+// Process multiple Fastq in parallel. 
 pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
     let (sender, receiver) = channel();
     
@@ -66,15 +91,28 @@ pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
     
     let mut all_reads: Vec<Fastq> = receiver.iter().collect();
     
-    write_results(&mut all_reads, path, iscsv);
+    write_fastq(&mut all_reads, path, iscsv);
 }
 
-fn write_results(results: &mut [Fastq], path: bool, iscsv: bool) {
+pub fn par_process_fasta(files: &[PathBuf]) {
+    let (sender, receiver) = channel();
+    
+    files.into_par_iter()
+        .for_each_with(sender, |s, recs| {
+            s.send(fasta::process_fasta(&recs)).unwrap();
+        });
+    
+    let mut all_reads: Vec<Fasta> = receiver.iter().collect();
+    
+    write_fasta(&mut all_reads);
+}
+
+fn write_fastq(results: &mut [Fastq], path: bool, iscsv: bool) {
     results.sort_by(|a, b| a.seqname.cmp(&b.seqname));
     println!("\n\x1b[1mResults:\x1b[0m");
     results.iter()
             .for_each(|recs| {
-                    write_to_console(&recs);
+                    write_fastq_console(&recs);
                 });
     
     println!("Total files: {}", results.len());
@@ -84,7 +122,23 @@ fn write_results(results: &mut [Fastq], path: bool, iscsv: bool) {
     }
 }
 
-fn write_to_console(all_reads: &Fastq) {
+fn write_fasta(contigs: &mut [Fasta]) {
+    contigs.sort_by(|a, b| a.seqname.cmp(&b.seqname));
+    contigs.iter()
+        .for_each(|recs| {
+            write_fasta_console(&recs);
+        });
+}
+
+fn write_fasta_console(contigs: &Fasta) {
+    let stdout = io::stdout();
+    let mut buff = io::BufWriter::new(stdout);
+
+    writeln!(buff, "File {:?}", contigs.seqname).unwrap();
+    writeln!(buff, "Length {}", contigs.contigs_len).unwrap();
+}
+
+fn write_fastq_console(all_reads: &Fastq) {
     let stdout = io::stdout();
     let mut buff = io::BufWriter::new(stdout);
     

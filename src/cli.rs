@@ -14,7 +14,6 @@ pub fn process_fastq_commands(version: &str) {
                 .about("Quickly count gc content from a fasta file")
                 .author("Heru Handika <hhandi1@lsu.edu>")
                 .setting(AppSettings::SubcommandRequiredElseHelp)
-                // Sub command for fastq
                 .subcommand(
                     App::new("fastq")
                         .about("Process fastq files")
@@ -73,6 +72,19 @@ pub fn process_fastq_commands(version: &str) {
                                 .takes_value(false)
                             )
                     )
+                .subcommand(
+                    App::new("fasta")
+                        .about("Process fasta files")
+                        .arg(
+                            Arg::with_name("wdir")
+                                .short("w")
+                                .long("wdir")
+                                .help("Find all files inside dir and process it")
+                                // .conflicts_with_all(&[ "dir", "file", "wildcard"])
+                                .takes_value(true)
+                                .value_name("PARENT DIR")
+                            )
+                )
                 .get_matches();
     
     println!("Starting simpleQC v{}...", &version);
@@ -108,14 +120,22 @@ pub fn process_fastq_commands(version: &str) {
                 
                 
             } else if fastq_matches.is_present("wdir") {
-                let val = fastq_matches.value_of("wdir").unwrap();
-                io::traverse_dir(&val, iscsv);
+                let entry = fastq_matches.value_of("wdir").unwrap();
+                io::traverse_dir(&entry, iscsv, true);
                 
             } else {
                 println!("No command provided!");
             }
         }
         
+        ("fasta", Some(fasta_matches)) => {
+            if fasta_matches.is_present("wdir") {
+                let entry: &str = fasta_matches.value_of("wdir").unwrap();
+                io::traverse_dir(&entry, false, false);
+            }
+        }
+
+
         _ => unreachable!("Unreachable commands!"),
     };
 }

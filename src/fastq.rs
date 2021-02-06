@@ -50,7 +50,7 @@ fn parse_fastq<R: BufRead>(buff: R, input: &PathBuf) -> Fastq {
     let mut outbuff = io::BufWriter::new(stdout);
 
     write!(outbuff, "Processing {:?}\t", 
-        &input.file_name().unwrap());
+        &input.file_name().unwrap()).unwrap();
 
     let mut reads: u32 = 0;
     let mut sq_per_read: Vec<SeqReads> = Vec::new();

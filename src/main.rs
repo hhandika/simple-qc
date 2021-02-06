@@ -4,6 +4,7 @@
 //! Lisence MIT
 
 mod io;
+mod fasta;
 mod fastq;
 mod sequence;
 mod qscores;

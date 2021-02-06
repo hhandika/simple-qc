@@ -126,6 +126,20 @@ impl Fastq {
     }
 }
 
+pub struct Fasta {
+    pub seqname: String,
+    pub contigs_len: u32,
+}
+
+impl Fasta {
+    pub fn new(input: &PathBuf, contigs: &u32) -> Self {
+        Self {
+            seqname : input.file_name().unwrap().to_string_lossy().into_owned(),
+            contigs_len : *contigs 
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
