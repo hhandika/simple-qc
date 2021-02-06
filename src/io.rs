@@ -136,6 +136,8 @@ fn write_fasta_console(contigs: &Fasta) {
 
     writeln!(buff, "File {:?}", contigs.seqname).unwrap();
     writeln!(buff, "Length {}", contigs.contigs_len).unwrap();
+    writeln!(buff, "GC {}", 
+        contigs.total_gc.to_formatted_string(&Locale::en)).unwrap();
 }
 
 fn write_fastq_console(all_reads: &Fastq) {

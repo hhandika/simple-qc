@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use flate2::bufread::MultiGzDecoder;
 
-use crate::sequence::Fasta;
+use crate::sequence::{Fasta, SeqReads};
 
 pub fn process_fasta(input: &PathBuf) -> Fasta {
     if is_gz_fasta(input) {
@@ -52,7 +52,8 @@ fn parse_fasta<R: BufRead>(buff: R, input: &PathBuf) -> Fasta {
     write!(stdbuf, "Processing {:?}\t",
         input.file_name().unwrap()).unwrap();
 
-    let mut contigs: u32 = 0;
+    let mut contig_counts: u32 = 0;
+    let mut contigs: Vec<SeqReads> = Vec::new();
     buff.lines()
         .filter_map(|ok| ok.ok())
         .filter(|recs| !recs.is_empty())
@@ -65,10 +66,13 @@ fn parse_fasta<R: BufRead>(buff: R, input: &PathBuf) -> Fasta {
                             LOOKING FOR '>' FOUND '{}' at line {}",
                             input, &recs, &idx + 1);
                     } else {
-                        contigs += 1;
+                        contig_counts += 1;
                     }
                 },
-                1 => println!("FASTA"),
+                1 => {
+                    let seq = SeqReads::get_seq_stats(&recs.trim().as_bytes());
+                    contigs.push(seq);
+                }
                 _ => panic!("INVALID FASTA!"),
             }
         });
@@ -76,7 +80,7 @@ fn parse_fasta<R: BufRead>(buff: R, input: &PathBuf) -> Fasta {
         
     writeln!(stdbuf, "DONE!").unwrap();
     
-    Fasta::new(input, &contigs)
+    Fasta::new(input, &contig_counts, &contigs)
 
 }
 

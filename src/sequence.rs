@@ -129,13 +129,15 @@ impl Fastq {
 pub struct Fasta {
     pub seqname: String,
     pub contigs_len: u32,
+    pub total_gc: u32,
 }
 
 impl Fasta {
-    pub fn new(input: &PathBuf, contigs: &u32) -> Self {
+    pub fn new(input: &PathBuf, contigs: &u32, seq: &[SeqReads]) -> Self {
         Self {
             seqname : input.file_name().unwrap().to_string_lossy().into_owned(),
-            contigs_len : *contigs 
+            contigs_len : *contigs,
+            total_gc: seq.iter().map(|s| s.gc_count).sum(),
         }
     }
 }
