@@ -23,6 +23,7 @@ fn is_gz_fasta(input: &PathBuf) -> bool {
     input.extension().unwrap() == "gz"
 }
 
+#[inline(always)]
 fn is_unzip_fasta(input: &PathBuf) -> bool {
     let ext = input.extension().unwrap();
 
@@ -98,6 +99,15 @@ mod test {
         
         assert_eq!(3, res.contigs_len);
         assert_eq!(3, res_unzip.contigs_len);
+    }
+
+    #[test]
+    fn process_spaced_fasta_test() {
+        let input = PathBuf::from("test_files/contigs_spaced.fasta");
+
+        let res = process_fasta(&input);
+        
+        assert_eq!(3, res.contigs_len);
     }
 
     #[test]
