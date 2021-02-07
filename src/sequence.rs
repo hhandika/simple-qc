@@ -128,17 +128,24 @@ impl Fastq {
 
 pub struct Fasta {
     pub seqname: String,
-    pub contigs_len: u32,
+    pub contig_counts: u32,
     pub total_gc: u32,
+    pub total_bp: u32, 
+    pub mean_ct: f64,
 }
 
 impl Fasta {
     pub fn new(input: &PathBuf, contigs: &u32, seq: &[SeqReads]) -> Self {
-        Self {
+        let mut conts = Self {
             seqname : input.file_name().unwrap().to_string_lossy().into_owned(),
-            contigs_len : *contigs,
+            contig_counts : *contigs,
+            total_bp: seq.iter().map(|s| s.seq_len).sum(),
             total_gc: seq.iter().map(|s| s.gc_count).sum(),
-        }
+            mean_ct: 0.0,
+        };
+        conts.mean_ct = conts.total_bp as f64 / conts.contig_counts as f64;
+
+        conts
     }
 }
 

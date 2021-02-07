@@ -55,28 +55,36 @@ fn parse_fasta<R: BufRead>(buff: R, input: &PathBuf) -> Fasta {
 
     let mut contig_counts: u32 = 0;
     let mut contigs: Vec<SeqReads> = Vec::new();
-    buff.lines()
-        .filter_map(|ok| ok.ok())
-        .filter(|recs| !recs.is_empty())
-        .enumerate()
-        .for_each(|(idx, recs)| {
-            match idx % 2 {
-                0 => {
-                    if !recs.starts_with('>') {
-                        panic!("{:?} IS INVALID FASTA. \
-                            LOOKING FOR '>' FOUND '{}' at line {}",
-                            input, &recs, &idx + 1);
-                    } else {
-                        contig_counts += 1;
-                    }
-                },
-                1 => {
-                    let seq = SeqReads::get_seq_stats(&recs.trim().as_bytes());
-                    contigs.push(seq);
-                }
-                _ => panic!("INVALID FASTA!"),
-            }
-        });
+    // buff.lines()
+    //     .filter_map(|ok| ok.ok())
+    //     .filter(|recs| !recs.is_empty())
+    //     .for_each(|recs| {
+    //                 if recs.starts_with('>') {
+    //                         contig_counts += 1;
+    //                 } else {
+    //                     let reads = SeqReads::get_seq_stats(&recs.trim().as_bytes());
+    //                     contigs.push(reads);
+    //                 }
+                
+    //     });
+    let mut reads = buff.lines();
+    while let Some(Ok(_line)) = reads.by_ref().next() {
+        // if line.starts_with(">") {
+        //     is_fasta = true;
+        // } else {
+        //     if is_fasta {
+        let seq = reads.by_ref()
+            .filter_map(|ok| ok.ok())
+            .filter(|recs| !recs.is_empty())
+            .take_while(|recs| !recs.starts_with(">"))
+            .collect::<String>();
+        let contig = SeqReads::get_seq_stats(&seq.as_bytes());
+        contigs.push(contig);
+        contig_counts += 1;
+        //     }
+            
+        // }
+    }
     
         
     writeln!(stdbuf, "DONE!").unwrap();
@@ -97,8 +105,8 @@ mod test {
         let res = process_fasta(&input);
         let res_unzip = process_fasta(&in_unzip);
         
-        assert_eq!(3, res.contigs_len);
-        assert_eq!(3, res_unzip.contigs_len);
+        assert_eq!(3, res.contig_counts);
+        assert_eq!(3, res_unzip.contig_counts);
     }
 
     #[test]
@@ -107,7 +115,7 @@ mod test {
 
         let res = process_fasta(&input);
         
-        assert_eq!(3, res.contigs_len);
+        assert_eq!(3, res.contig_counts);
     }
 
     #[test]

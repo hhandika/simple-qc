@@ -135,9 +135,14 @@ fn write_fasta_console(contigs: &Fasta) {
     let mut buff = io::BufWriter::new(stdout);
 
     writeln!(buff, "File {:?}", contigs.seqname).unwrap();
-    writeln!(buff, "Length {}", contigs.contigs_len).unwrap();
+    writeln!(buff, "Contigs count {}", 
+        contigs.contig_counts.to_formatted_string(&Locale::en)).unwrap();
+    writeln!(buff, "BP {}", 
+        contigs.total_bp.to_formatted_string(&Locale::en)).unwrap();
     writeln!(buff, "GC {}", 
         contigs.total_gc.to_formatted_string(&Locale::en)).unwrap();
+    writeln!(buff, "Mean {}", 
+        contigs.mean_ct).unwrap();
 }
 
 fn write_fastq_console(all_reads: &Fastq) {
