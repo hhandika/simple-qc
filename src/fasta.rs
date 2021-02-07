@@ -80,7 +80,7 @@ impl<R: Read> Iterator for Fasta<R> {
 
     fn next(&mut self) -> Option<String> {
         while let Some(Ok(line)) = self.reader.next() {
-            if line.starts_with(">") {
+            if line.starts_with('>') {
                 if self.id {                    
                     let mut res = String::new();
                     res.push_str(&self.seq);
