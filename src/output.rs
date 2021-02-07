@@ -6,6 +6,7 @@ use crate::sequence::{FastqStats, FastaStats};
 
 pub fn write_fastq(results: &mut [FastqStats], path: bool, iscsv: bool) {
     results.sort_by(|a, b| a.seqname.cmp(&b.seqname));
+
     println!("\n\x1b[1mResults:\x1b[0m");
     results.iter()
             .for_each(|recs| {
@@ -15,19 +16,24 @@ pub fn write_fastq(results: &mut [FastqStats], path: bool, iscsv: bool) {
     println!("Total files: {}", results.len());
 
     if iscsv {
-        write_to_csv(results, path);
+        write_fastq_csv(results, path);
     }
 }
 
-pub fn write_fasta(contigs: &mut [FastaStats]) {
-    contigs.sort_by(|a, b| a.seqname.cmp(&b.seqname));
+pub fn write_fasta(stats: &mut [FastaStats], path: bool, iscsv: bool) {
+    stats.sort_by(|a, b| a.seqname.cmp(&b.seqname));
+
     println!("\n\x1b[1mResults:\x1b[0m");
-    contigs.iter()
+    stats.iter()
         .for_each(|recs| {
             write_fasta_console(&recs);
         });
     
-    println!("Total files: {}", contigs.len());
+    println!("Total files: {}", stats.len());
+    
+    if iscsv {
+        write_fasta_csv(stats, path);
+    }
 }
 
 fn write_fasta_console(contigs: &FastaStats) {
@@ -157,23 +163,37 @@ fn write_fastq_console(all_reads: &FastqStats) {
     
 }
 
-fn write_to_csv(all_reads: &[FastqStats], path: bool) {
-    let outname = "sQC-Fastq.csv";
-    let output = File::create(outname).
-                    expect("FILE EXISTS.");
+fn write_fastq_csv(all_reads: &[FastqStats], path: bool) {
+    let fname = "sQC-Fastq.csv";
+    let output = File::create(&fname).expect("FILE EXISTS.");
     let mut line = LineWriter::new(output);
 
-    write_csv_header(&mut line, path);
-            
+    write_fastq_header(&mut line, path);
+    
     all_reads.iter()
-        .for_each(|seq| {
-            write_csv_contents(seq, &mut line, path)
-        });
-
-    println!("Fastq results is save as {}", outname);
+    .for_each(|seq| {
+        write_fastq_contents(seq, &mut line, path)
+    });
+    
+    println!("Stats results is save as {}", fname);
 }
 
-fn write_csv_header<W: Write>(line:&mut W, path: bool) {
+fn write_fasta_csv(stats: &[FastaStats], path: bool) {
+    let fname = "sQC-Fasta.csv";
+    let output = File::create(&fname).expect("FILE EXISTS.");
+    let mut line = LineWriter::new(output);
+
+    write_fasta_header(&mut line, path);
+    
+    stats.iter()
+    .for_each(|seq| {
+        write_fasta_contents(seq, &mut line, path)
+    });
+    
+    println!("Stats results is save as {}", fname);
+}
+
+fn write_fastq_header<W: Write>(line:&mut W, path: bool) {
     if path {
         write!(line, "Path,").unwrap();
     }
@@ -196,7 +216,7 @@ fn write_csv_header<W: Write>(line:&mut W, path: bool) {
         .unwrap();
 }
 
-fn write_csv_contents<W: Write>(seq: &FastqStats, line:&mut W, path: bool) {
+fn write_fastq_contents<W: Write>(seq: &FastqStats, line:&mut W, path: bool) {
     if path {
         write!(line, "{},", seq.path).unwrap();
     }
@@ -216,5 +236,51 @@ fn write_csv_contents<W: Write>(seq: &FastqStats, line:&mut W, path: bool) {
         seq.mean_qscores,
         seq.sum_low_bases,
         seq.low_bases_ratio,
+    ).unwrap();
+}
+
+fn write_fasta_header<W: Write>(line:&mut W, path: bool) {
+    if path {
+        write!(line, "Path,").unwrap();
+    }
+    writeln!(line, 
+        "Sequence_names,\
+        Congtig_counts,\
+        Total_sequence_length,\
+        GC_counts,\
+        GC-content,\
+        N_counts,\
+        N-content,\
+        Min_contig_length,\
+        Max_contig_length,\
+        Mean_contig_length,\
+        Median_contig_length,\
+        Stdev_contig_length,\
+        No_contigs_>750bp,\
+        No_contigs_>1000bp,\
+        No_contigs_>1500bp")
+        .unwrap();
+}
+
+fn write_fasta_contents<W: Write>(seq: &FastaStats, line:&mut W, path: bool) {
+    if path {
+        write!(line, "{},", seq.path).unwrap();
+    }
+    writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
+        seq.seqname,
+        seq.contig_counts,
+        seq.total_bp,
+        seq.total_gc, 
+        seq.gc_content,
+        seq.total_n, 
+        seq.n_content,
+        seq.min,
+        seq.max,
+        seq.mean,
+        seq.median,
+        seq.sd,
+        seq.con750,
+        seq.con1000,
+        seq.con1500,
     ).unwrap();
 }
