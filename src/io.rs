@@ -181,7 +181,7 @@ fn write_fastq_console(all_reads: &FastqStats) {
         &all_reads.n_content).unwrap();
     
     writeln!(buff, "Sequence length\t\t: {} bp\n", 
-        &all_reads.total_base
+        &all_reads.total_bp
         .to_formatted_string(&Locale::en)).unwrap();
 
     //---------------------------
@@ -217,7 +217,7 @@ fn write_fastq_console(all_reads: &FastqStats) {
     writeln!(buff, "Low Q-score ratio\t: {:.2}\n",
         &all_reads.low_bases_ratio).unwrap();
     
-    if all_reads.total_base != all_reads.sum_qlen {
+    if all_reads.total_bp != all_reads.sum_qlen {
         writeln!(buff, 
             "\x1b[0;33mWARNING!\n\
             \x1b[3mSome bases may not have Q-score.\n\
@@ -274,7 +274,7 @@ fn write_csv_contents<W: Write>(seq: &FastqStats, line:&mut W, path: bool) {
     writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
         seq.seqname,
         seq.read_count,
-        seq.total_base,
+        seq.total_bp,
         seq.total_gc, 
         seq.gc_content,
         seq.total_n, 

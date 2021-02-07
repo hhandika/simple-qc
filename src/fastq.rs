@@ -127,7 +127,7 @@ mod tests {
         let input = PathBuf::from("test_files/whitespace.fastq.gz");
         let res = parse_gunzip_fastq(&input);
 
-        assert_eq!(70, res.total_base);
+        assert_eq!(70, res.total_bp);
         assert_eq!(0, res.sum_low_bases);
         assert_eq!(32.0, res.mean_qscores);
     }
@@ -137,7 +137,7 @@ mod tests {
         let input = PathBuf::from("test_files/valid.fastq.gz");
         let res = parse_gunzip_fastq(&input);
 
-        assert_eq!(140, res.total_base);
+        assert_eq!(140, res.total_bp);
         assert_eq!(0, res.sum_low_bases);
         assert_eq!(0.0, res.n_content);
         assert_eq!(64, res.total_gc);
