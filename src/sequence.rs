@@ -134,7 +134,7 @@ pub struct FastaStats {
     pub total_n: u32,
     pub gc_content: f64,
     pub n_content: f64, 
-    pub mean_ct: f64,
+    pub mean: f64,
     pub min: u32,
 }
 
@@ -150,7 +150,7 @@ impl FastaStats {
             gc_content: 0.0,
             n_content: 0.0,
             min: seq.iter().map(|s| s.seq_len).min().unwrap(),
-            mean_ct: 0.0,
+            mean: 0.0,
         };
     
         seq.gc_content();
@@ -169,7 +169,7 @@ impl FastaStats {
     }
 
     fn mean(&mut self) {
-        self.mean_ct = self.total_bp as f64 / self.contig_counts as f64;
+        self.mean = self.total_bp as f64 / self.contig_counts as f64;
     }
 }
 

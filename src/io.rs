@@ -138,10 +138,23 @@ fn write_fasta_console(contigs: &FastaStats) {
     let mut buff = io::BufWriter::new(stdout);
 
     writeln!(buff, "\x1b[0;32mFile {:?}\x1b[0m", contigs.seqname).unwrap();
+
     writeln!(buff, "No. of contigs\t\t: {}", 
         contigs.contig_counts.to_formatted_string(&Locale::en)).unwrap();
+
     writeln!(buff, "Total GC count\t\t: {}", 
         contigs.total_gc.to_formatted_string(&Locale::en)).unwrap();
+    
+    writeln!(buff, "GC-content\t\t: {:.2}", 
+        &contigs.gc_content).unwrap();
+
+    writeln!(buff, "Total N count\t\t: {}", 
+        &contigs.total_n
+        .to_formatted_string(&Locale::en)).unwrap();
+
+    writeln!(buff, "N-content\t\t: {:.4}", 
+        &contigs.n_content).unwrap();
+
     writeln!(buff, "Sequence length\t\t: {} bp\n", 
         contigs.total_bp.to_formatted_string(&Locale::en)).unwrap();
     
@@ -150,7 +163,7 @@ fn write_fasta_console(contigs: &FastaStats) {
     writeln!(buff, "Min\t\t\t: {} bp", 
         contigs.min.to_formatted_string(&Locale::en)).unwrap();
     writeln!(buff, "Mean\t\t\t: {:.2} bp", 
-        contigs.mean_ct).unwrap();
+        contigs.mean).unwrap();
     
     writeln!(buff).unwrap();
 }
