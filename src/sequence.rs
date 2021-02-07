@@ -44,7 +44,7 @@ pub struct FastqStats {
     pub path: String,
     pub seqname: String,
     pub read_count: u32,
-    pub total_base: u64, 
+    pub total_bp: u64, 
     pub min_reads: u32,
     pub max_reads: u32,
     pub mean_reads: f64,
@@ -73,7 +73,7 @@ impl FastqStats {
             path: fname.parent().unwrap().to_string_lossy().into_owned(),
             seqname: fname.file_name().unwrap().to_string_lossy().into_owned(),
             read_count: reads.clone(),
-            total_base: seq_len.iter().sum::<u32>() as u64,
+            total_bp: seq_len.iter().sum::<u32>() as u64,
             min_reads: *seq_len.iter().min().unwrap(),
             max_reads: *seq_len.iter().max().unwrap(),
             median_reads: median(&seq_len),
@@ -101,15 +101,15 @@ impl FastqStats {
     }
     
     fn gc_content(&mut self) {
-        self.gc_content = self.total_gc as f64 / self.total_base as f64;
+        self.gc_content = self.total_gc as f64 / self.total_bp as f64;
     }
 
     fn n_content(&mut self) {
-        self.n_content = self.total_n as f64 / self.total_base as f64;
+        self.n_content = self.total_n as f64 / self.total_bp as f64;
     }
 
     fn mean_seq(&mut self) {
-        self.mean_reads = self.total_base as f64 / self.read_count as f64;
+        self.mean_reads = self.total_bp as f64 / self.read_count as f64;
     }
 
     fn stdev(&mut self, seq_len: &[u32]) {
@@ -121,32 +121,55 @@ impl FastqStats {
     }
 
     fn low_bases(&mut self) {
-        self.low_bases_ratio = self.sum_low_bases as f64 / self.total_base as f64;
+        self.low_bases_ratio = self.sum_low_bases as f64 / self.total_bp as f64;
     }
 }
 
 pub struct FastaStats {
+    pub path: String,
     pub seqname: String,
     pub contig_counts: u32,
     pub total_gc: u32,
-    pub total_bp: u32, 
+    pub total_bp: u32,
+    pub total_n: u32,
+    pub gc_content: f64,
+    pub n_content: f64, 
     pub mean_ct: f64,
     pub min: u32,
 }
 
 impl FastaStats {
     pub fn new(input: &PathBuf, contigs: &u32, seq: &[SeqReads]) -> Self {
-        let mut conts = Self {
-            seqname : input.file_name().unwrap().to_string_lossy().into_owned(),
+        let mut seq = Self {
+            path: input.parent().unwrap().to_string_lossy().into_owned(),
+            seqname: input.file_name().unwrap().to_string_lossy().into_owned(),
             contig_counts : *contigs,
             total_bp: seq.iter().map(|s| s.seq_len).sum(),
             total_gc: seq.iter().map(|s| s.gc_count).sum(),
+            total_n: seq.iter().map(|n| n.n_count).sum(),
+            gc_content: 0.0,
+            n_content: 0.0,
             min: seq.iter().map(|s| s.seq_len).min().unwrap(),
             mean_ct: 0.0,
         };
-        conts.mean_ct = conts.total_bp as f64 / conts.contig_counts as f64;
+    
+        seq.gc_content();
+        seq.n_content();
+        seq.mean();
 
-        conts
+        seq
+    }
+
+    fn gc_content(&mut self) {
+        self.gc_content = self.total_gc as f64 / self.total_bp as f64;
+    }
+
+    fn n_content(&mut self) {
+        self.n_content = self.total_n as f64 / self.total_bp as f64;
+    }
+
+    fn mean(&mut self) {
+        self.mean_ct = self.total_bp as f64 / self.contig_counts as f64;
     }
 }
 
@@ -220,7 +243,7 @@ mod tests {
 
         assert_eq!("test.fastq", res.seqname);
         assert_eq!(2, res.read_count);
-        assert_eq!(16, res.total_base);
+        assert_eq!(16, res.total_bp);
         assert_eq!(8, res.total_gc);
         assert_eq!(0.5, res.gc_content);
         assert_eq!(2, res.total_n);
