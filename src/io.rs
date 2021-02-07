@@ -124,27 +124,35 @@ fn write_fastq(results: &mut [Fastq], path: bool, iscsv: bool) {
 
 fn write_fasta(contigs: &mut [FastaStats]) {
     contigs.sort_by(|a, b| a.seqname.cmp(&b.seqname));
+    println!("\n\x1b[1mResults:\x1b[0m");
     contigs.iter()
         .for_each(|recs| {
             write_fasta_console(&recs);
         });
+    
+    println!("Total files: {}", contigs.len());
 }
 
 fn write_fasta_console(contigs: &FastaStats) {
     let stdout = io::stdout();
     let mut buff = io::BufWriter::new(stdout);
 
-    writeln!(buff, "File {:?}", contigs.seqname).unwrap();
-    writeln!(buff, "Contigs count {}", 
+    writeln!(buff, "\x1b[0;32mFile {:?}\x1b[0m", contigs.seqname).unwrap();
+    writeln!(buff, "No. of contigs\t\t: {}", 
         contigs.contig_counts.to_formatted_string(&Locale::en)).unwrap();
-    writeln!(buff, "BP {}", 
-        contigs.total_bp.to_formatted_string(&Locale::en)).unwrap();
-    writeln!(buff, "GC {}", 
+    writeln!(buff, "Total GC count\t\t: {}", 
         contigs.total_gc.to_formatted_string(&Locale::en)).unwrap();
-    writeln!(buff, "Min {}", 
+    writeln!(buff, "Sequence length\t\t: {} bp\n", 
+        contigs.total_bp.to_formatted_string(&Locale::en)).unwrap();
+    
+    //---------------------------
+    writeln!(buff, "\x1b[0;34mContigs:\x1b[0m").unwrap();
+    writeln!(buff, "Min\t\t\t: {} bp", 
         contigs.min.to_formatted_string(&Locale::en)).unwrap();
-    writeln!(buff, "Mean {}", 
+    writeln!(buff, "Mean\t\t\t: {:.2} bp", 
         contigs.mean_ct).unwrap();
+    
+    writeln!(buff).unwrap();
 }
 
 fn write_fastq_console(all_reads: &Fastq) {
@@ -175,7 +183,8 @@ fn write_fastq_console(all_reads: &Fastq) {
     writeln!(buff, "Sequence length\t\t: {} bp\n", 
         &all_reads.total_base
         .to_formatted_string(&Locale::en)).unwrap();
-    
+
+    //---------------------------
     writeln!(buff, "\x1b[0;34mReads:\x1b[0m").unwrap();
 
     writeln!(buff, "Min\t\t\t: {} bp", 
@@ -195,6 +204,7 @@ fn write_fastq_console(all_reads: &Fastq) {
     writeln!(buff, "Stdev\t\t\t: {:.2}\n", 
         &all_reads.sd_reads).unwrap();
 
+    //--------------------
     writeln!(buff, "\x1b[0;34mPhred Q-Scores:\x1b[0m").unwrap();
 
     writeln!(buff, "Mean\t\t\t: {:.2}",
