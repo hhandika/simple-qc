@@ -126,7 +126,7 @@ impl Fastq {
     }
 }
 
-pub struct Fasta {
+pub struct FastaStats {
     pub seqname: String,
     pub contig_counts: u32,
     pub total_gc: u32,
@@ -135,7 +135,7 @@ pub struct Fasta {
     pub min: u32,
 }
 
-impl Fasta {
+impl FastaStats {
     pub fn new(input: &PathBuf, contigs: &u32, seq: &[SeqReads]) -> Self {
         let mut conts = Self {
             seqname : input.file_name().unwrap().to_string_lossy().into_owned(),

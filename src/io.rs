@@ -14,7 +14,7 @@ use walkdir::WalkDir;
 
 use crate::fasta;
 use crate::fastq;
-use crate::sequence::{Fastq, Fasta};
+use crate::sequence::{Fastq, FastaStats};
 
 pub fn traverse_dir(path: &str, iscsv: bool, fastq: bool) {
     let mut entries: Vec<PathBuf> = Vec::new();
@@ -102,7 +102,7 @@ pub fn par_process_fasta(files: &[PathBuf]) {
             s.send(fasta::process_fasta(&recs)).unwrap();
         });
     
-    let mut all_reads: Vec<Fasta> = receiver.iter().collect();
+    let mut all_reads: Vec<FastaStats> = receiver.iter().collect();
     
     write_fasta(&mut all_reads);
 }
@@ -122,7 +122,7 @@ fn write_fastq(results: &mut [Fastq], path: bool, iscsv: bool) {
     }
 }
 
-fn write_fasta(contigs: &mut [Fasta]) {
+fn write_fasta(contigs: &mut [FastaStats]) {
     contigs.sort_by(|a, b| a.seqname.cmp(&b.seqname));
     contigs.iter()
         .for_each(|recs| {
@@ -130,7 +130,7 @@ fn write_fasta(contigs: &mut [Fasta]) {
         });
 }
 
-fn write_fasta_console(contigs: &Fasta) {
+fn write_fasta_console(contigs: &FastaStats) {
     let stdout = io::stdout();
     let mut buff = io::BufWriter::new(stdout);
 
