@@ -132,6 +132,7 @@ pub struct Fasta {
     pub total_gc: u32,
     pub total_bp: u32, 
     pub mean_ct: f64,
+    pub min: u32,
 }
 
 impl Fasta {
@@ -141,6 +142,7 @@ impl Fasta {
             contig_counts : *contigs,
             total_bp: seq.iter().map(|s| s.seq_len).sum(),
             total_gc: seq.iter().map(|s| s.gc_count).sum(),
+            min: seq.iter().map(|s| s.seq_len).min().unwrap(),
             mean_ct: 0.0,
         };
         conts.mean_ct = conts.total_bp as f64 / conts.contig_counts as f64;

@@ -55,36 +55,44 @@ fn parse_fasta<R: BufRead>(buff: R, input: &PathBuf) -> Fasta {
 
     let mut contig_counts: u32 = 0;
     let mut contigs: Vec<SeqReads> = Vec::new();
-    // buff.lines()
-    //     .filter_map(|ok| ok.ok())
-    //     .filter(|recs| !recs.is_empty())
-    //     .for_each(|recs| {
-    //                 if recs.starts_with('>') {
-    //                         contig_counts += 1;
-    //                 } else {
-    //                     let reads = SeqReads::get_seq_stats(&recs.trim().as_bytes());
-    //                     contigs.push(reads);
-    //                 }
+    buff.lines()
+        .filter_map(|ok| ok.ok())
+        .filter(|recs| !recs.is_empty())
+        .for_each(|recs| {
+            if recs.starts_with('>') {
+                    contig_counts += 1;
+            } else {
+                let reads = SeqReads::get_seq_stats(&recs.trim().as_bytes());
+                contigs.push(reads);
+            }
                 
-    //     });
-    let mut reads = buff.lines();
-    while let Some(Ok(_line)) = reads.by_ref().next() {
-        // if line.starts_with(">") {
-        //     is_fasta = true;
-        // } else {
-        //     if is_fasta {
-        let seq = reads.by_ref()
-            .filter_map(|ok| ok.ok())
-            .filter(|recs| !recs.is_empty())
-            .take_while(|recs| !recs.starts_with(">"))
-            .collect::<String>();
-        let contig = SeqReads::get_seq_stats(&seq.as_bytes());
-        contigs.push(contig);
-        contig_counts += 1;
-        //     }
-            
-        // }
-    }
+        });
+    // let mut reads = buff.lines();
+
+    // // loop {
+    // //     let seq = reads.by_ref()
+    // //         .filter_map(|ok| ok.ok())
+    // //         .filter(|recs| !recs.is_empty())
+    // //         .take_while(|recs| !recs.starts_with(">"))
+    // //         .collect::<String>();
+    // //     let contig = SeqReads::get_seq_stats(&seq.as_bytes());
+    // //     contigs.push(contig);
+    // //     contig_counts += 1;
+    // // }
+    // while let Some(Ok(line)) = reads.by_ref().next() {
+    //     if line.starts_with(">") {
+    //         continue; }
+    //     // } else {
+    //     //     if is_fasta {
+    //     let seq = reads.by_ref()
+    //         .filter_map(|ok| ok.ok())
+    //         .filter(|recs| !recs.is_empty())
+    //         .take_while(|recs| !recs.starts_with(">"))
+    //         .collect::<String>();
+    //     let contig = SeqReads::get_seq_stats(&seq.as_bytes());
+    //     contigs.push(contig);
+    //     contig_counts += 1;
+    // }
     
         
     writeln!(stdbuf, "DONE!").unwrap();

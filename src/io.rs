@@ -141,6 +141,8 @@ fn write_fasta_console(contigs: &Fasta) {
         contigs.total_bp.to_formatted_string(&Locale::en)).unwrap();
     writeln!(buff, "GC {}", 
         contigs.total_gc.to_formatted_string(&Locale::en)).unwrap();
+    writeln!(buff, "Min {}", 
+        contigs.min.to_formatted_string(&Locale::en)).unwrap();
     writeln!(buff, "Mean {}", 
         contigs.mean_ct).unwrap();
 }
