@@ -32,6 +32,8 @@ fn is_unzip_fasta(input: &PathBuf) -> bool {
     ext == "fasta" || ext == "fas" || ext == "fs"
 }
 
+
+
 fn parse_fasta<R: Read>(file: R, input: &PathBuf) -> FastaStats {
     let stdout = io::stdout();
     let mut stdbuf = io::BufWriter::new(stdout);
@@ -43,7 +45,7 @@ fn parse_fasta<R: Read>(file: R, input: &PathBuf) -> FastaStats {
     let mut contigs: Vec<SeqReads> = Vec::new();
 
     let file = Fasta::new(file);
-    
+
     file.into_iter()
         .for_each(|recs| {
             contig_counts += 1;
@@ -51,7 +53,7 @@ fn parse_fasta<R: Read>(file: R, input: &PathBuf) -> FastaStats {
             contigs.push(reads);
         });
         
-    writeln!(stdbuf, "DONE!").unwrap();
+    writeln!(stdbuf, "\x1b[0;32mDONE!\x1b[0m").unwrap();
     
     FastaStats::new(input, &contig_counts, &contigs)
 }
@@ -63,13 +65,14 @@ pub struct Fasta<R> {
 }
 
 impl<R: Read> Fasta<R> {
-    pub fn new(file: R) -> Self {
+    fn new(file: R) -> Self {
         Self {
             reader: BufReader::new(file).lines(),
             id: false,
             seq: String::new()
         }
-    } 
+    }
+    
 }
 
 impl<R: Read> Iterator for Fasta<R> {
@@ -154,12 +157,4 @@ mod test {
 
         process_fasta(&fname);
     }
-
-    // #[test]
-    // #[should_panic]
-    // fn parse_fasta_test() {
-    //     let input = PathBuf::from("test_files/invalid.fasta");
-
-    //     process_fasta(&input);
-    // }
 }
