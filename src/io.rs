@@ -14,7 +14,7 @@ use walkdir::WalkDir;
 
 use crate::fasta;
 use crate::fastq;
-use crate::sequence::{Fastq, FastaStats};
+use crate::sequence::{FastqStats, FastaStats};
 
 pub fn traverse_dir(path: &str, iscsv: bool, fastq: bool) {
     let mut entries: Vec<PathBuf> = Vec::new();
@@ -89,7 +89,7 @@ pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
             s.send(fastq::process_fastq(&recs)).unwrap();
         });
     
-    let mut all_reads: Vec<Fastq> = receiver.iter().collect();
+    let mut all_reads: Vec<FastqStats> = receiver.iter().collect();
     
     write_fastq(&mut all_reads, path, iscsv);
 }
@@ -107,7 +107,7 @@ pub fn par_process_fasta(files: &[PathBuf]) {
     write_fasta(&mut all_reads);
 }
 
-fn write_fastq(results: &mut [Fastq], path: bool, iscsv: bool) {
+fn write_fastq(results: &mut [FastqStats], path: bool, iscsv: bool) {
     results.sort_by(|a, b| a.seqname.cmp(&b.seqname));
     println!("\n\x1b[1mResults:\x1b[0m");
     results.iter()
@@ -155,7 +155,7 @@ fn write_fasta_console(contigs: &FastaStats) {
     writeln!(buff).unwrap();
 }
 
-fn write_fastq_console(all_reads: &Fastq) {
+fn write_fastq_console(all_reads: &FastqStats) {
     let stdout = io::stdout();
     let mut buff = io::BufWriter::new(stdout);
     
@@ -228,7 +228,7 @@ fn write_fastq_console(all_reads: &Fastq) {
     
 }
 
-fn write_to_csv(all_reads: &[Fastq], path: bool) {
+fn write_to_csv(all_reads: &[FastqStats], path: bool) {
     let outname = "sQC-Fastq.csv";
     let output = File::create(outname).
                     expect("FILE EXISTS.");
@@ -267,7 +267,7 @@ fn write_csv_header<W: Write>(line:&mut W, path: bool) {
         .unwrap();
 }
 
-fn write_csv_contents<W: Write>(seq: &Fastq, line:&mut W, path: bool) {
+fn write_csv_contents<W: Write>(seq: &FastqStats, line:&mut W, path: bool) {
     if path {
         write!(line, "{},", seq.path).unwrap();
     }
