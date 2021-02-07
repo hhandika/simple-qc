@@ -30,9 +30,8 @@ impl SeqReads {
     fn count_reads(&mut self, reads: &[u8]) {
         reads.iter().for_each(|base|
                 match base {
-                    b'G' | b'g' => self.gc_count += 1,
-                    b'C' | b'c' => self.gc_count += 1,
-                    b'N' | b'n' => self.n_count += 1,
+                    b'G' | b'g' | b'C' | b'c' => self.gc_count += 1,
+                    b'N' | b'n'               => self.n_count += 1,
                     _ => (), 
                 });                   
     }
