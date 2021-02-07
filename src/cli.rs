@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use clap::{App, AppSettings, Arg};
 
-use crate::io;
+use crate::input;
 
 pub fn process_fastq_commands(version: &str) {
     let args = App::new("simpleQC")
@@ -121,7 +121,7 @@ pub fn process_fastq_commands(version: &str) {
                 
             } else if fastq_matches.is_present("wdir") {
                 let entry = fastq_matches.value_of("wdir").unwrap();
-                io::traverse_dir(&entry, iscsv, true);
+                input::traverse_dir(&entry, iscsv, true);
                 
             } else {
                 println!("No command provided!");
@@ -131,7 +131,7 @@ pub fn process_fastq_commands(version: &str) {
         ("fasta", Some(fasta_matches)) => {
             if fasta_matches.is_present("wdir") {
                 let entry: &str = fasta_matches.value_of("wdir").unwrap();
-                io::traverse_dir(&entry, false, false);
+                input::traverse_dir(&entry, false, false);
             }
         }
 
@@ -149,7 +149,7 @@ fn process_dir(entry: &str, gunzip: bool, iscsv: bool) {
     }
 
     let path = input.join(files);
-    io::glob_dir(&path, iscsv);
+    input::glob_dir(&path, iscsv);
 }
 
 #[inline(always)]
@@ -158,5 +158,5 @@ fn process_multiple_entries(entries: &[&str], iscsv: bool) {
                                 .map(PathBuf::from)
                                 .collect();
     let path = false;
-    io::par_process_fastq(&files, path, iscsv);
+    input::par_process_fastq(&files, path, iscsv);
 }

@@ -3,13 +3,14 @@
 //! Read dir for qc
 //! Lisence MIT
 
-mod io;
+mod cli;
+mod input;
 mod fasta;
 mod fastq;
 mod sequence;
 mod qscores;
 mod stats;
-mod cli;
+mod output;
 
 use std::time::Instant;
 
