@@ -6,7 +6,7 @@
 use std::path::PathBuf;
 
 use crate::qscores::*;
-use crate::stats::*;
+use crate::stats;
 
 pub struct SeqReads {
     pub seq_len: u32,
@@ -72,11 +72,11 @@ impl FastqStats {
         let mut seq = Self {
             path: fname.parent().unwrap().to_string_lossy().into_owned(),
             seqname: fname.file_name().unwrap().to_string_lossy().into_owned(),
-            read_count: reads.clone(),
+            read_count: *reads,
             total_bp: seq_len.iter().sum::<u32>() as u64,
             min_reads: *seq_len.iter().min().unwrap(),
             max_reads: *seq_len.iter().max().unwrap(),
-            median_reads: median(&seq_len),
+            median_reads: stats::median(&seq_len),
             total_gc: vec.iter().map(|v| v.gc_count).sum(),
             total_n: vec.iter().map(|v| v.n_count).sum(),
             sum_qlen: qscores.iter().map(|q| q.q_len).sum::<u32>() as u64,
@@ -113,7 +113,7 @@ impl FastqStats {
     }
 
     fn stdev(&mut self, seq_len: &[u32]) {
-        self.sd_reads = stdev(&seq_len, &self.mean_reads);
+        self.sd_reads = stats::stdev(&seq_len, &self.mean_reads);
     }
 
     fn mean_q(&mut self) {
@@ -136,11 +136,17 @@ pub struct FastaStats {
     pub n_content: f64, 
     pub mean: f64,
     pub min: u32,
+    pub max: u32,
+    pub median: f64,
+    pub sd: f64,
+    pub con750: usize,
+    pub con1000: usize,
+    pub con1500: usize,
 }
 
 impl FastaStats {
     pub fn new(input: &PathBuf, contigs: &u32, seq: &[SeqReads]) -> Self {
-        let mut seq = Self {
+        let mut con = Self {
             path: input.parent().unwrap().to_string_lossy().into_owned(),
             seqname: input.file_name().unwrap().to_string_lossy().into_owned(),
             contig_counts : *contigs,
@@ -150,14 +156,22 @@ impl FastaStats {
             gc_content: 0.0,
             n_content: 0.0,
             min: seq.iter().map(|s| s.seq_len).min().unwrap(),
+            max: seq.iter().map(|s| s.seq_len).max().unwrap(),
+            con750: seq.iter().map(|s| s.seq_len).filter(|s| *s > 750).count(),
+            con1000: seq.iter().map(|s| s.seq_len).filter(|s| *s > 1000).count(),
+            con1500: seq.iter().map(|s| s.seq_len).filter(|s| *s > 1500).count(),
             mean: 0.0,
+            median: 0.0,
+            sd: 0.0,
         };
     
-        seq.gc_content();
-        seq.n_content();
-        seq.mean();
+        con.gc_content();
+        con.n_content();
+        con.mean();
+        con.median(seq);
+        con.stdev(seq);
 
-        seq
+        con
     }
 
     fn gc_content(&mut self) {
@@ -170,6 +184,17 @@ impl FastaStats {
 
     fn mean(&mut self) {
         self.mean = self.total_bp as f64 / self.contig_counts as f64;
+    }
+
+    fn median(&mut self, seq: &[SeqReads]) {
+        let contigs = seq.iter().map(|s| s.seq_len).collect::<Vec<u32>>();
+
+        self.median = stats::median(&contigs);
+    }
+
+    fn stdev(&mut self, seq: &[SeqReads]) {
+        let contigs = seq.iter().map(|s| s.seq_len).collect::<Vec<u32>>();
+        self.sd = stats::stdev(&contigs, &self.mean);
     }
 }
 

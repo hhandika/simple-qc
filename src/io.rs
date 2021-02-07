@@ -162,8 +162,27 @@ fn write_fasta_console(contigs: &FastaStats) {
     writeln!(buff, "\x1b[0;34mContigs:\x1b[0m").unwrap();
     writeln!(buff, "Min\t\t\t: {} bp", 
         contigs.min.to_formatted_string(&Locale::en)).unwrap();
+
+    writeln!(buff, "Max\t\t\t: {} bp", 
+        &contigs.max.to_formatted_string(&Locale::en)).unwrap();
+
     writeln!(buff, "Mean\t\t\t: {:.2} bp", 
         contigs.mean).unwrap();
+    
+    writeln!(buff, "Median\t\t\t: {:.2} bp", 
+        &contigs.median).unwrap();
+
+    writeln!(buff, "Stdev\t\t\t: {:.2}", 
+        &contigs.sd).unwrap();
+
+    writeln!(buff, "Contigs >750 bp\t\t: {}", 
+        &contigs.con750.to_formatted_string(&Locale::en)).unwrap();
+    
+    writeln!(buff, "Contigs >1000 bp\t: {}", 
+        &contigs.con1000.to_formatted_string(&Locale::en)).unwrap();
+    
+    writeln!(buff, "Contigs >1500 bp\t: {}", 
+        &contigs.con1500.to_formatted_string(&Locale::en)).unwrap();
     
     writeln!(buff).unwrap();
 }
