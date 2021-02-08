@@ -11,17 +11,17 @@ use crate::input;
 pub fn process_fastq_commands(version: &str) {
     let args = App::new("simpleQC")
                 .version(version)
-                .about("Quickly count gc content from a fasta file")
+                .about("A simple CLI app for NGS quality control.")
                 .author("Heru Handika <hhandi1@lsu.edu>")
                 .setting(AppSettings::SubcommandRequiredElseHelp)
                 .subcommand(
                     App::new("fastq")
-                        .about("Process fastq files")
+                        .about("Uses for FASTQ (raw-sequences) inputs")
                         .arg(
                             Arg::with_name("dir")
                                 .short("d")
                                 .long("dir")
-                                .help("Process fastq inside a directory")
+                                .help("Inputs a single directory")
                                 .conflicts_with_all(&["file", "wildcard", "wdir"])
                                 .takes_value(true)
                                 .value_name("DIR")
@@ -31,7 +31,7 @@ pub fn process_fastq_commands(version: &str) {
                             Arg::with_name("file")
                                 .short("f")
                                 .long("file")
-                                .help("Process a single file")
+                                .help("Inputs a single file")
                                 .conflicts_with_all(&[ "dir", "wildcard", "wdir"])
                                 .multiple(true)
                                 .value_name("FASTQ FILE")
@@ -41,7 +41,7 @@ pub fn process_fastq_commands(version: &str) {
                             Arg::with_name("wildcard")
                                 .short("c")
                                 .long("wildcard")
-                                .help("Finds files using wildcards")
+                                .help("Finds files using wildcards. Allows multiple inputs")
                                 .conflicts_with_all(&[ "dir", "file","wdir"])
                                 .multiple(true)
                                 .value_name("WILDCARD")
@@ -51,7 +51,7 @@ pub fn process_fastq_commands(version: &str) {
                             Arg::with_name("wdir")
                                 .short("w")
                                 .long("wdir")
-                                .help("Find all files inside dir and process it")
+                                .help("Tranverses through nested directories")
                                 .conflicts_with_all(&[ "dir", "file", "wildcard"])
                                 .takes_value(true)
                                 .value_name("PARENT DIR")
@@ -60,26 +60,26 @@ pub fn process_fastq_commands(version: &str) {
                         .arg(
                             Arg::with_name("nocsv")
                                 .long("nocsv")
-                                .help("Do not save results")
+                                .help("Does not save results")
                                 .takes_value(false)
                             )
                         
                         .arg(
                             Arg::with_name("nogz")
                                 .long("nogz")
-                                .help("Unzip fastq input")
+                                .help("Input is an uncompressed FASTQ files")
                                 .conflicts_with_all(&["file", "wdir", "wildcard"])
                                 .takes_value(false)
                             )
                     )
                 .subcommand(
                     App::new("fasta")
-                        .about("Process fasta files")
+                        .about("Uses for FASTA (sequence assemblies) inputs")
                         .arg(
                             Arg::with_name("dir")
                                 .short("d")
                                 .long("dir")
-                                .help("Process fasta inside a directory")
+                                .help("Inputs a single directory")
                                 .conflicts_with_all(&["file", "wildcard", "wdir"])
                                 .takes_value(true)
                                 .value_name("DIR")
@@ -89,27 +89,27 @@ pub fn process_fastq_commands(version: &str) {
                             Arg::with_name("file")
                                 .short("f")
                                 .long("file")
-                                .help("Process a single file")
+                                .help("Inputs FASTA files. Allows multiple inputs")
                                 .conflicts_with_all(&[ "dir", "wildcard", "wdir"])
                                 .multiple(true)
-                                .value_name("FASTQ FILE")
+                                .value_name("FASTQ FILES")
                             )
 
                         .arg(
                             Arg::with_name("wildcard")
                                 .short("c")
                                 .long("wildcard")
-                                .help("Finds files using wildcards")
+                                .help("Finds files using wildcards. Allows multiple inputs")
                                 .conflicts_with_all(&[ "dir", "file","wdir"])
                                 .multiple(true)
-                                .value_name("WILDCARD")
+                                .value_name("WILDCARDS")
                             )
                         
                         .arg(
                             Arg::with_name("wdir")
                                 .short("w")
                                 .long("wdir")
-                                .help("Find all files inside dir and process it")
+                                .help("Tranverses through nested directories")
                                 .conflicts_with_all(&[ "dir", "file", "wildcard"])
                                 .takes_value(true)
                                 .value_name("PARENT DIR")
@@ -118,14 +118,14 @@ pub fn process_fastq_commands(version: &str) {
                         .arg(
                             Arg::with_name("nocsv")
                                 .long("nocsv")
-                                .help("Do not save results")
+                                .help("Does not save results")
                                 .takes_value(false)
                             )
                         
                         .arg(
                             Arg::with_name("gz")
                                 .long("gz")
-                                .help("Gunzip fasta input")
+                                .help("Input is a compressed FASTA file")
                                 .conflicts_with_all(&["file", "wdir", "wildcard"])
                                 .takes_value(false)
                             )
@@ -215,8 +215,7 @@ pub fn process_fastq_commands(version: &str) {
         _ => unreachable!("Unreachable commands!"),
     };
 }
-
-#[inline(always)]
+ 
 fn process_dir(entry: &str, query: &str, iscsv: bool, fastq: bool) {
     let input = PathBuf::from(&entry);
     let glob = format!("*.{}", query);
@@ -224,7 +223,6 @@ fn process_dir(entry: &str, query: &str, iscsv: bool, fastq: bool) {
     input::glob_dir(&path, iscsv, fastq);
 }
 
-#[inline(always)]
 fn process_multiple_files(entries: &[&str], iscsv: bool, fastq: bool) {
     let files: Vec<PathBuf> = entries.iter()
         .map(PathBuf::from).collect();
