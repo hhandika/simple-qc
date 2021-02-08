@@ -1,3 +1,6 @@
+## 0.3.1
+- Clearer command line helps.
+
 ## 0.3.0
 - Add fasta support
 
