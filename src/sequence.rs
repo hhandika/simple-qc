@@ -38,8 +38,6 @@ impl SeqReads {
     
 }
 
-
-// Add Q-len and low bases
 pub struct FastqStats {
     pub path: String,
     pub seqname: String,
