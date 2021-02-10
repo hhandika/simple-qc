@@ -35,9 +35,9 @@ cargo build --release
 cp target/release/sqc [your-target-folder]
 ```
 
-### For Windows WSL users:
+### For WSL users:
 
-You may receive linking errors during compilation because some WSL distro does not install C compiler by default. Hence, install C compiler first and try to re-compiled again. 
+You may receive linking errors during compilation because some WSL distros do not install C compiler by default. Hence, install C compiler first and try to re-compiled again. 
 
 The easiest way is to install the C development package. 
 
