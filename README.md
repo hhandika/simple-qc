@@ -92,6 +92,10 @@ sqc fasta --help
 ```
 
 ## State of The Code
-The code is fully working and well-tested. It is, however, still at the early stage. Please, expect constant re-structuring and refactoring. If you are just using the program, you should not need to worry about it.  
+The code is fully working and well-tested. It is, however, still at the early stage. Please, expect constant re-structuring and refactoring. If you are just using the program, you should not need to worry about it. 
 
+## Citations
+I have no plan to publish it in a journal yet. My current plan is to eventually publish it in Zenodo. In the mean time, please use this Github repo if you cite this program.
 
+## Acknowledgment
+simpleQC is heavily inspired by [Phyluce](https://phyluce.readthedocs.io/en/latest/) pipeline. It was initially designed to tackle the limitation of the pipeline. Some of the ideas for the program was also inspired by [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) program.  [Giovani Hernández-Canchola](https://scholar.google.com/citations?hl=en&user=B6rbNOEAAAAJ&view_op=list_works) tested the early version of the program and has provided invaluable feedback to further develop it. The iterator for Fasta was from [Rosetta Code](https://rosettacode.org/wiki/FASTA_format#Rust) that I modified to suit the needs for the program. Ultimately, thanks to [Rust-lang](https://www.rust-lang.org/) open-source developers and community in general for providing amazing documentations and libraries. 
