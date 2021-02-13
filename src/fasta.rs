@@ -22,14 +22,16 @@ pub fn process_fasta(input: &PathBuf) -> FastaStats {
 
 #[inline(always)]
 fn is_gz_fasta(input: &PathBuf) -> bool {
-    input.extension().unwrap() == "gz"
+    let ext = input.extension().unwrap();
+    
+    ext == "gz" || ext == "gzip"
 }
 
 #[inline(always)]
 fn is_unzip_fasta(input: &PathBuf) -> bool {
     let ext = input.extension().unwrap();
 
-    ext == "fasta" || ext == "fas" || ext == "fs"
+    ext == "fasta" || ext == "fas" || ext == "fa"
 }
 
 
@@ -136,13 +138,15 @@ mod test {
     #[test]
     fn is_gz_fasta_test() {
         let fname = PathBuf::from("valid.fasta.gz");
+        let fname_gzip = PathBuf::from("valid.fasta.gzip");
         assert_eq!(true, is_gz_fasta(&fname));
+        assert_eq!(true, is_gz_fasta(&fname_gzip));
     }
 
     #[test]
     fn is_unzip_fasta_test() {
         let fname = PathBuf::from("valid.fasta");
-        let fname_fs = PathBuf::from("valid.fs");
+        let fname_fs = PathBuf::from("valid.fa");
         let fname_fas = PathBuf::from("valid.fas");
 
         assert_eq!(true, is_unzip_fasta(&fname));
