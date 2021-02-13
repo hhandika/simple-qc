@@ -8,7 +8,7 @@ use clap::{App, AppSettings, Arg};
 
 use crate::input;
 
-pub fn process_fastq_commands(version: &str) {
+pub fn get_cli(version: &str) {
     let args = App::new("simpleQC")
                 .version(version)
                 .about("A simple CLI app for NGS quality control.")

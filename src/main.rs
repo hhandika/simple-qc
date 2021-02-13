@@ -19,7 +19,7 @@ fn main() {
     
     let start_time = Instant::now();
 
-    cli::process_fastq_commands(version);
+    cli::get_cli(version);
 
     let duration = start_time.elapsed();
 
