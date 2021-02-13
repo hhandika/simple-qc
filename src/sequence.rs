@@ -137,6 +137,7 @@ pub struct FastaStats {
     pub max: u32,
     pub median: f64,
     pub sd: f64,
+    pub n50: u32,
     pub con750: usize,
     pub con1000: usize,
     pub con1500: usize,
@@ -155,6 +156,7 @@ impl FastaStats {
             n_content: 0.0,
             min: seq.iter().map(|s| s.seq_len).min().unwrap(),
             max: seq.iter().map(|s| s.seq_len).max().unwrap(),
+            n50: 0,
             con750: seq.iter().map(|s| s.seq_len).filter(|s| *s > 750).count(),
             con1000: seq.iter().map(|s| s.seq_len).filter(|s| *s > 1000).count(),
             con1500: seq.iter().map(|s| s.seq_len).filter(|s| *s > 1500).count(),
@@ -168,6 +170,7 @@ impl FastaStats {
         con.mean();
         con.median(seq);
         con.stdev(seq);
+        con.n50(seq);
 
         con
     }
@@ -193,6 +196,11 @@ impl FastaStats {
     fn stdev(&mut self, seq: &[SeqReads]) {
         let contigs = seq.iter().map(|s| s.seq_len).collect::<Vec<u32>>();
         self.sd = stats::stdev(&contigs, &self.mean);
+    }
+
+    fn n50(&mut self, seq: &[SeqReads]) {
+        let contigs = seq.iter().map(|s| s.seq_len).collect::<Vec<u32>>();
+        self.n50 = stats::n50_stats(&contigs);
     }
 }
 

@@ -55,7 +55,7 @@ pub fn stdev(vec: &[u32], mean: &f64) -> f64 {
     var.sqrt()
 }
 
-#[allow(dead_code)]
+
 fn sort_vec_desc(vec: &[u32]) -> Vec<u32> {
     let mut sorted_vec = vec.to_vec();
     sorted_vec.sort_by_key(|v| Reverse(*v));
@@ -63,7 +63,7 @@ fn sort_vec_desc(vec: &[u32]) -> Vec<u32> {
     sorted_vec
 }
 
-#[allow(dead_code)]
+
 fn cumsum(vec: &[u32]) -> Vec<u32> {
     let mut csum = Vec::new();
     let mut sum = 0;
@@ -76,7 +76,7 @@ fn cumsum(vec: &[u32]) -> Vec<u32> {
     csum
 }
 
-#[allow(dead_code)]
+
 fn n2_stats(contigs: &[u32]) -> usize {
     let n2 = contigs.iter().sum::<u32>() / 2;
     

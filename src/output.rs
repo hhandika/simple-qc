@@ -77,6 +77,9 @@ fn write_fasta_console(contigs: &FastaStats) {
 
     writeln!(buff, "Stdev\t\t\t: {:.2}", 
         &contigs.sd).unwrap();
+    
+    writeln!(buff, "N50\t\t\t: {}", 
+        &contigs.n50.to_formatted_string(&Locale::en)).unwrap();
 
     writeln!(buff, "Contigs >750 bp\t\t: {}", 
         &contigs.con750.to_formatted_string(&Locale::en)).unwrap();
