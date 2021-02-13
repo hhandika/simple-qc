@@ -16,7 +16,18 @@ use crate::sequence::{FastqStats, FastaStats};
 use crate::output;
 
 pub fn traverse_dir(path: &str, iscsv: bool, fastq: bool) {
-    let mut entries: Vec<PathBuf> = Vec::new();
+    let entries = call_walkdir(path, fastq);
+
+    let is_path = true;
+    if fastq {
+        par_process_fastq(&entries, is_path, iscsv);   
+    } else {
+        par_process_fasta(&entries, is_path, iscsv);
+    }
+}
+
+pub fn call_walkdir(path: &str, fastq: bool) -> Vec<PathBuf> {
+    let mut entries = Vec::new();
 
     WalkDir::new(path).into_iter()
         .filter_map(|ok| ok.ok())
@@ -32,13 +43,7 @@ pub fn traverse_dir(path: &str, iscsv: bool, fastq: bool) {
             
         });
     
-    let is_path = true;
-    if fastq {
-        par_process_fastq(&entries, is_path, iscsv);   
-    } else {
-        par_process_fasta(&entries, is_path, iscsv);
-    }
-                         
+    entries                    
 }
 
 fn match_fastq(files: &str, entries: &mut Vec<PathBuf>) {
@@ -57,6 +62,7 @@ fn match_fasta(files: &str, entries: &mut Vec<PathBuf>) {
     match files {
         s if s.ends_with(".fasta.gz") => entries.push(PathBuf::from(files)),
         s if s.ends_with(".fas.gz") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fa.gz") => entries.push(PathBuf::from(files)),
         s if s.ends_with(".fasta.gzip") => entries.push(PathBuf::from(files)),
         s if s.ends_with(".fa.gzip") => entries.push(PathBuf::from(files)),
         s if s.ends_with(".fasta") => entries.push(PathBuf::from(files)),
@@ -124,5 +130,39 @@ mod tests {
         let files = get_files(&input);
 
         assert_eq!(4, files.len())
-    }   
+    }
+    
+    #[test]
+    fn tranverse_dir_test() {
+        let input = "test_files/";
+        let files = call_walkdir (&input, false);
+
+        assert_eq!(5, files.len())
+    } 
+
+    #[test]
+    fn match_fasta_test() {
+        let input = vec!["test.fasta", "test.fas", "test.fa", "test.fa.gz"];
+        let mut entries = Vec::new();
+
+        input.iter()
+            .for_each(|e| {
+                match_fasta(&e, &mut entries);
+            });
+
+        assert_eq!(4, entries.len());
+    }
+
+    #[test]
+    fn match_fastq_test() {
+        let input = vec!["test.fq", "test.fastq", "test.fq.gz", "test.fa.gz"];
+        let mut entries = Vec::new();
+
+        input.iter()
+            .for_each(|e| {
+                match_fastq(&e, &mut entries);
+            });
+
+        assert_eq!(3, entries.len());
+    }
 }
