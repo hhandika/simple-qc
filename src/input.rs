@@ -67,7 +67,7 @@ fn match_fasta(files: &str, entries: &mut Vec<PathBuf>) {
 }
 
 pub fn glob_dir(path: &PathBuf, iscsv: bool, fastq: bool) {
-    let files = process_glob_dir(path);
+    let files = get_files(path);
 
     if files.is_empty() {
         panic!("CAN'T FIND 'fastq'/'fastq.gz' FILES.");
@@ -80,7 +80,7 @@ pub fn glob_dir(path: &PathBuf, iscsv: bool, fastq: bool) {
     }
 }
 
-pub fn process_glob_dir(path: &PathBuf) -> Vec<PathBuf> {
+pub fn get_files(path: &PathBuf) -> Vec<PathBuf> {
     glob(&path.to_string_lossy())
         .expect("Failed to read files")
         .filter_map(|recs| recs.ok()) 
@@ -121,7 +121,7 @@ mod tests {
     #[test]
     fn glob_test() {
         let input = PathBuf::from("test_files/*.fasta");
-        let files = process_glob_dir(&input);
+        let files = get_files(&input);
 
         assert_eq!(4, files.len())
     }   
