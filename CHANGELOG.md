@@ -1,3 +1,6 @@
+## 0.3.2
+- Add support for gzip extension in fasta
+
 ## 0.3.1
 - Clearer command line helps.
 
