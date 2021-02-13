@@ -6,7 +6,7 @@
 use std::path::PathBuf;
 
 use crate::qscores::*;
-use crate::stats;
+use crate::stats::{self, NStats};
 
 pub struct SeqReads {
     pub seq_len: u32,
@@ -164,13 +164,15 @@ impl FastaStats {
             median: 0.0,
             sd: 0.0,
         };
+
+        let contigs = seq.iter().map(|s| s.seq_len).collect::<Vec<u32>>();
     
         con.gc_content();
         con.n_content();
         con.mean();
-        con.median(seq);
-        con.stdev(seq);
-        con.n50(seq);
+        con.median(&contigs);
+        con.stdev(&contigs);
+        con.n50(&contigs);
 
         con
     }
@@ -187,20 +189,19 @@ impl FastaStats {
         self.mean = self.total_bp as f64 / self.contig_counts as f64;
     }
 
-    fn median(&mut self, seq: &[SeqReads]) {
-        let contigs = seq.iter().map(|s| s.seq_len).collect::<Vec<u32>>();
-
+    fn median(&mut self, contigs: &[u32]) {
         self.median = stats::median(&contigs);
     }
 
-    fn stdev(&mut self, seq: &[SeqReads]) {
-        let contigs = seq.iter().map(|s| s.seq_len).collect::<Vec<u32>>();
-        self.sd = stats::stdev(&contigs, &self.mean);
+    fn stdev(&mut self, contigs: &[u32]) {
+        self.sd = stats::stdev(contigs, &self.mean);
     }
 
-    fn n50(&mut self, seq: &[SeqReads]) {
-        let contigs = seq.iter().map(|s| s.seq_len).collect::<Vec<u32>>();
-        self.n50 = stats::n50_stats(&contigs);
+    fn n50(&mut self, contigs: &[u32]) {
+        let mut stats = NStats::new(contigs);
+        stats.get_n50();
+
+        self.n50 = stats.n50;
     }
 }
 

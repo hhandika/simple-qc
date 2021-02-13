@@ -248,7 +248,7 @@ fn write_fasta_header<W: Write>(line:&mut W, path: bool) {
     }
     writeln!(line, 
         "Sequence_names,\
-        Congtig_counts,\
+        Contig_counts,\
         Total_sequence_length,\
         GC_counts,\
         GC-content,\
@@ -259,6 +259,7 @@ fn write_fasta_header<W: Write>(line:&mut W, path: bool) {
         Mean_contig_length,\
         Median_contig_length,\
         Stdev_contig_length,\
+        n50,\
         No_contigs_>750bp,\
         No_contigs_>1000bp,\
         No_contigs_>1500bp")
@@ -269,7 +270,7 @@ fn write_fasta_contents<W: Write>(seq: &FastaStats, line:&mut W, path: bool) {
     if path {
         write!(line, "{},", seq.path).unwrap();
     }
-    writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
+    writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
         seq.seqname,
         seq.contig_counts,
         seq.total_bp,
@@ -282,6 +283,7 @@ fn write_fasta_contents<W: Write>(seq: &FastaStats, line:&mut W, path: bool) {
         seq.mean,
         seq.median,
         seq.sd,
+        seq.n50,
         seq.con750,
         seq.con1000,
         seq.con1500,
