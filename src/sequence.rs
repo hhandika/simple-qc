@@ -202,6 +202,8 @@ impl FastaStats {
     fn nstats(&mut self, contigs: &[u32]) {
         let mut stats = NStats::new(contigs);
         stats.get_n50();
+        stats.get_n75();
+        stats.get_n90();
 
         self.n50 = stats.n50;
         self.n75 = stats.n75;
