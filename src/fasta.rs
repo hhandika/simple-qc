@@ -55,7 +55,7 @@ fn parse_fasta<R: Read>(file: R, input: &PathBuf) -> FastaStats {
         
     writeln!(stdbuf, "\x1b[0;32mDONE!\x1b[0m").unwrap();
     
-    FastaStats::new(input, &contig_counts, &contigs)
+    FastaStats::get_stats(input, &contig_counts, &contigs)
 }
 
 pub struct Fasta<R> {
