@@ -78,7 +78,7 @@ impl<R: Read> Fasta<R> {
 impl<R: Read> Iterator for Fasta<R> {
     type Item = String;
 
-    fn next(&mut self) -> Option<String> {
+    fn next(&mut self) -> Option<Self::Item> {
         while let Some(Ok(line)) = self.reader.next() {
             if line.starts_with('>') {
                 if self.id {                    
