@@ -1,14 +1,17 @@
+## 0.4.0
+- Add N50, N75, and N90 statistics for fasta analyses.
+
 ## 0.3.2
-- Add support for gzip extension in fasta
+- Fix gzip extension not recognized in fasta.
 
 ## 0.3.1
 - Clearer command line helps.
 
 ## 0.3.0
-- Add fasta support
+- Add fasta support.
 
 ## 0.2.2
-- The program now can handle over 150 Gb sequence length
+- The program now can handle over 150 Gb sequence length.
 - Allow unzip support for directory traversal option.
 
 ## 0.2.1
@@ -19,7 +22,7 @@
 - Allow unzipped fastq files.
     
 ## 0.1.7
-- Fix issues the program panic after finding empty line in at the end of fastq files.
+- Fix issues the program panic after finding empty lines.
 
 ## 0.1.6
 - First public release.
