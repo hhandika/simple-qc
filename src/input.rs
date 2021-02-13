@@ -67,11 +67,8 @@ fn match_fasta(files: &str, entries: &mut Vec<PathBuf>) {
 }
 
 pub fn glob_dir(path: &PathBuf, iscsv: bool, fastq: bool) {
-    let files: Vec<PathBuf> = glob(&path.to_string_lossy())
-        .expect("Failed to read files")
-        .filter_map(|recs| recs.ok()) 
-        .collect();
-    
+    let files = process_glob_dir(path);
+
     if files.is_empty() {
         panic!("CAN'T FIND 'fastq'/'fastq.gz' FILES.");
     }
@@ -81,7 +78,13 @@ pub fn glob_dir(path: &PathBuf, iscsv: bool, fastq: bool) {
     } else {
         par_process_fasta(&files, false, iscsv)
     }
+}
 
+pub fn process_glob_dir(path: &PathBuf) -> Vec<PathBuf> {
+    glob(&path.to_string_lossy())
+        .expect("Failed to read files")
+        .filter_map(|recs| recs.ok()) 
+        .collect()
 }
 
 // Process multiple Fastq in parallel. 
@@ -111,14 +114,15 @@ pub fn par_process_fasta(files: &[PathBuf], path: bool, iscsv: bool) {
     output::write_fasta(&mut all_reads, path, iscsv);
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//     #[test]
-//     #[should_panic]
-//     fn check_input_file_test() {
-//         let input = "some_fastq.gz";
-//         check_input_file(&input);
-//     }   
-// }
+    #[test]
+    fn glob_test() {
+        let input = PathBuf::from("test_files/*.fasta");
+        let files = process_glob_dir(&input);
+
+        assert_eq!(4, files.len())
+    }   
+}
