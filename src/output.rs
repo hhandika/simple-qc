@@ -266,9 +266,9 @@ fn write_fasta_header<W: Write>(line:&mut W, path: bool) {
         Mean_contig_length,\
         Median_contig_length,\
         Stdev_contig_length,\
-        n50,\
-        n75,\
-        n90,\
+        N50,\
+        N75,\
+        N90,\
         No_contigs_>750bp,\
         No_contigs_>1000bp,\
         No_contigs_>1500bp")
