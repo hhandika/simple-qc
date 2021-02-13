@@ -75,19 +75,15 @@ fn cumsum(vec: &[u32]) -> Vec<u32> {
     csum
 }
 
-#[allow(dead_code)]
+
 pub struct NStats {
     sorted_contigs: Vec<u32>,
     csum_contigs: Vec<u32>,
     sum_contigs: u32,
     n50_len: u32,
-    n75_len: u32,
-    n50_idx: usize,
     pub n50: u32,
-    pub n75: u32,
 }
 
-#[allow(dead_code)]
 impl NStats {
     pub fn new(contigs: &[u32]) -> Self {
         let mut nstats = Self {
@@ -95,10 +91,7 @@ impl NStats {
             csum_contigs: Vec::new(),
             sum_contigs: contigs.iter().sum::<u32>(),
             n50_len: 0,
-            n75_len: 0,
-            n50_idx: 0,
             n50: 0,
-            n75: 0,
         };
 
         nstats.csum_contigs = cumsum(&nstats.sorted_contigs); 
@@ -111,12 +104,6 @@ impl NStats {
         let idx = self.get_n50_idx(self.n50_len);
         self.n50 = self.sorted_contigs[idx];
     }
-
-    // pub fn get_n75(&mut self) {
-    //     self.n75_len = self.n_len(0.75);
-    //     let idx = self.get_n50_idx(self.n75_len);
-    //     self.n75 = self.sorted_contigs[idx];
-    // }
 
     fn get_n50_idx(&mut self, n: u32) -> usize {
         self.csum_contigs.iter()
