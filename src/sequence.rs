@@ -1,11 +1,9 @@
 //! Heru Handika
-//! 31 December 2020
 //! Modules to process sequencing data
-//! Lisence MIT
 
 use std::path::PathBuf;
 
-use crate::qscores::*;
+use crate::qscores::QScore;
 use crate::stats::{self, NStats};
 
 pub struct SeqReads {

@@ -1,6 +1,5 @@
 //! Heru Handika
-//! 28 December 2020
-//! Read dir for qc
+//! First created: 28 December 2020
 //! Lisence MIT
 
 mod cli;

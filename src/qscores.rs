@@ -1,6 +1,5 @@
 //! Heru Handika
-//! 31 December 2020
-//! Decode Illumina 1.8 Quality Scores
+//! Only support Illumina 1.8 Quality Scores
 
 pub struct QScore {
     pub q_len: u32,

@@ -1,5 +1,4 @@
 //! Heru Handika
-//! 1 January 2020
 //! Module for statistics
 
 use std::cmp::Reverse;

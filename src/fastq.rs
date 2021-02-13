@@ -5,8 +5,8 @@ use std::path::PathBuf;
 
 use flate2::bufread::MultiGzDecoder;
 
-use crate::sequence::*;
-use crate::qscores::*;
+use crate::sequence::{FastqStats, SeqReads};
+use crate::qscores::QScore;
 
 pub fn process_fastq(input: &PathBuf) -> FastqStats {
     if is_gunzip(input) {
