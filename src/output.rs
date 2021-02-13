@@ -222,8 +222,8 @@ fn write_fastq_header<W: Write>(line:&mut W, path: bool) {
         Stdev read length,\
         Mean q-score,\
         Low base < 20,\
-        Low q-score ratio")
-        .unwrap();
+        Low q-score ratio"
+    ).unwrap();
 }
 
 fn write_fastq_contents<W: Write>(seq: &FastqStats, line:&mut W, path: bool) {
@@ -271,8 +271,8 @@ fn write_fasta_header<W: Write>(line:&mut W, path: bool) {
         N90,\
         No_contigs_>750bp,\
         No_contigs_>1000bp,\
-        No_contigs_>1500bp")
-        .unwrap();
+        No_contigs_>1500bp"
+    ).unwrap();
 }
 
 fn write_fasta_contents<W: Write>(seq: &FastaStats, line:&mut W, path: bool) {
