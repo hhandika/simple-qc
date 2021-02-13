@@ -143,7 +143,7 @@ pub struct FastaStats {
 }
 
 impl FastaStats {
-    pub fn new(input: &PathBuf, contigs: &u32, seq: &[SeqReads]) -> Self {
+    pub fn get_stats(input: &PathBuf, contigs: &u32, seq: &[SeqReads]) -> Self {
         let mut con = Self {
             path: input.parent().unwrap().to_string_lossy().into_owned(),
             seqname: input.file_name().unwrap().to_string_lossy().into_owned(),
@@ -199,6 +199,7 @@ impl FastaStats {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use assert_approx_eq::assert_approx_eq;
 
     #[test]
     fn gc_count_test() {
@@ -279,4 +280,34 @@ mod tests {
         assert_eq!(0.0, res.low_bases_ratio);
     }
     
+    #[test]
+    fn fasta_stats_test() {
+        let fname = PathBuf::from("data/test.fasta");
+        let a = "AA";
+        let b = "AAGC";
+        let contigs = 1;
+
+        let mut seq: Vec<SeqReads> = Vec::new();
+        let seq_a = SeqReads::get_seq_stats(&a.as_bytes());
+        seq.push(seq_a);
+
+        let seq_b = SeqReads::get_seq_stats(&b.as_bytes());
+        seq.push(seq_b);
+
+        let cont = FastaStats::get_stats(&fname, &contigs, &seq);
+
+        assert_eq!("data", cont.path);
+        assert_eq!("test.fasta", cont.seqname);
+        assert_eq!(1, cont.contig_counts);
+        assert_eq!(6, cont.total_bp);
+        assert_eq!(0, cont.total_n);
+        assert_eq!(2, cont.total_gc);
+        assert_eq!(2, cont.min);
+        assert_eq!(4, cont.max);
+        assert_eq!(0, cont.con750);
+        assert_eq!(0, cont.con1000);
+        assert_eq!(0, cont.con1500);
+        assert_approx_eq!(0.333, cont.gc_content, 3f64);
+        assert_approx_eq!(3.0, cont.median, 1f64);
+    }
 }
