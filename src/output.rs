@@ -81,6 +81,13 @@ fn write_fasta_console(contigs: &FastaStats) {
     writeln!(buff, "N50\t\t\t: {}", 
         &contigs.n50.to_formatted_string(&Locale::en)).unwrap();
 
+    writeln!(buff, "N75\t\t\t: {}", 
+        &contigs.n75.to_formatted_string(&Locale::en)).unwrap();
+
+    writeln!(buff, "N90\t\t\t: {}", 
+        &contigs.n90.to_formatted_string(&Locale::en)).unwrap();
+
+
     writeln!(buff, "Contigs >750 bp\t\t: {}", 
         &contigs.con750.to_formatted_string(&Locale::en)).unwrap();
     
@@ -260,6 +267,8 @@ fn write_fasta_header<W: Write>(line:&mut W, path: bool) {
         Median_contig_length,\
         Stdev_contig_length,\
         n50,\
+        n75,\
+        n90,\
         No_contigs_>750bp,\
         No_contigs_>1000bp,\
         No_contigs_>1500bp")
@@ -270,7 +279,7 @@ fn write_fasta_contents<W: Write>(seq: &FastaStats, line:&mut W, path: bool) {
     if path {
         write!(line, "{},", seq.path).unwrap();
     }
-    writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
+    writeln!(line, "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}", 
         seq.seqname,
         seq.contig_counts,
         seq.total_bp,
@@ -284,6 +293,8 @@ fn write_fasta_contents<W: Write>(seq: &FastaStats, line:&mut W, path: bool) {
         seq.median,
         seq.sd,
         seq.n50,
+        seq.n75,
+        seq.n90,
         seq.con750,
         seq.con1000,
         seq.con1500,

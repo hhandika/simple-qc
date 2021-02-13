@@ -74,13 +74,16 @@ fn cumsum(vec: &[u32]) -> Vec<u32> {
     csum
 }
 
-
 pub struct NStats {
     sorted_contigs: Vec<u32>,
     csum_contigs: Vec<u32>,
     sum_contigs: u32,
     n50_len: u32,
+    n75_len: u32,
+    n90_len: u32,
     pub n50: u32,
+    pub n75: u32,
+    pub n90: u32,
 }
 
 impl NStats {
@@ -90,7 +93,11 @@ impl NStats {
             csum_contigs: Vec::new(),
             sum_contigs: contigs.iter().sum::<u32>(),
             n50_len: 0,
+            n75_len: 0,
+            n90_len: 0,
             n50: 0,
+            n75: 0,
+            n90: 0,
         };
 
         nstats.csum_contigs = cumsum(&nstats.sorted_contigs); 
@@ -100,11 +107,23 @@ impl NStats {
 
     pub fn get_n50(&mut self) {
         self.n50_len = self.n_len(0.5);
-        let idx = self.get_n50_idx(self.n50_len);
+        let idx = self.get_n_idx(self.n50_len);
         self.n50 = self.sorted_contigs[idx];
     }
 
-    fn get_n50_idx(&mut self, n: u32) -> usize {
+    pub fn get_n75(&mut self) {
+        self.n75_len = self.n_len(0.75);
+        let idx = self.get_n_idx(self.n75_len);
+        self.n75 = self.sorted_contigs[idx];
+    }
+
+    pub fn get_n90(&mut self) {
+        self.n90_len = self.n_len(0.9);
+        let idx = self.get_n_idx(self.n90_len);
+        self.n90 = self.sorted_contigs[idx];
+    }
+
+    fn get_n_idx(&mut self, n: u32) -> usize {
         self.csum_contigs.iter()
             .position(|i| *i >= n)
             .unwrap()
@@ -167,25 +186,19 @@ mod test {
         assert_eq!(res, sort_vec_desc(&a));
     }
 
-    // #[test]
-    // fn n2_test() {
-    //     let a = vec![2,3,4,5,6,7,8,9,10];
-    //     let b = vec![2,3,4,5,6,7,8,9,10,11];
-    //     let mut seq = NStats::new(&a);
-    //     seq.get_n50();
-    //     let mut seq_b = NStats::new(&b);
-    //     seq_b.get_n50();
-    //     assert_eq!(27, seq.n2);
-    //     assert_eq!(32, seq_b.n2);
-    // }
-
     #[test]
     fn n50_stats_test() {
         let contigs = vec![2,3,4,5,6,7,8,9,10];
         let mut seq = NStats::new(&contigs);
         seq.get_n50();
-        // seq.get_n75();
+        seq.get_n90();
+        seq.get_n75();
+
         assert_eq!(27, seq.n50_len);
         assert_eq!(8, seq.n50);
+        assert_eq!(40, seq.n75_len);
+        assert_eq!(6, seq.n75);
+        assert_eq!(48, seq.n90_len);
+        assert_eq!(4, seq.n90);
     }
 }
