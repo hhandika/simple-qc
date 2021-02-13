@@ -58,10 +58,10 @@ fn match_fasta(files: &str, entries: &mut Vec<PathBuf>) {
         s if s.ends_with(".fasta.gz") => entries.push(PathBuf::from(files)),
         s if s.ends_with(".fas.gz") => entries.push(PathBuf::from(files)),
         s if s.ends_with(".fasta.gzip") => entries.push(PathBuf::from(files)),
-        s if s.ends_with(".fs.gzip") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fa.gzip") => entries.push(PathBuf::from(files)),
         s if s.ends_with(".fasta") => entries.push(PathBuf::from(files)),
         s if s.ends_with(".fas") => entries.push(PathBuf::from(files)),
-        s if s.ends_with(".fs") => entries.push(PathBuf::from(files)),
+        s if s.ends_with(".fa") => entries.push(PathBuf::from(files)),
         _ => (),
     };
 }
