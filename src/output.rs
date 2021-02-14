@@ -185,7 +185,7 @@ fn write_fastq_csv(all_reads: &[FastqStats], path: bool) {
         write_fastq_contents(seq, &mut line, path)
     });
     
-    println!("Stats results is save as {}", fname);
+    println!("The result is saved as {}", fname);
 }
 
 fn write_fasta_csv(stats: &[FastaStats], path: bool) {
@@ -200,7 +200,7 @@ fn write_fasta_csv(stats: &[FastaStats], path: bool) {
         write_fasta_contents(seq, &mut line, path)
     });
     
-    println!("Stats results is save as {}", fname);
+    println!("The result is saved as {}", fname);
 }
 
 fn write_fastq_header<W: Write>(line:&mut W, path: bool) {
