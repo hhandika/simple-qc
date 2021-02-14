@@ -1,3 +1,6 @@
+## 0.4.1
+- Fix confusing panic messages for a directory input.
+
 ## 0.4.0
 - Add N50, N75, and N90 statistics for fasta analyses.
 
