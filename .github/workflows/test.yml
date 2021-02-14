@@ -6,7 +6,15 @@ on: push
 jobs:
   check:
     name: Check
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        name: [
+            linux,
+            windows,
+            macos
+        ]
+
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -25,7 +33,15 @@ jobs:
 
   test:
     name: Test Suite
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        name: [
+            linux,
+            windows,
+            macos
+        ]
+        
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
