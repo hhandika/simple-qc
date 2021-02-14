@@ -75,7 +75,7 @@ pub fn glob_dir(path: &PathBuf, iscsv: bool, fastq: bool) {
     let files = call_glob(path);
 
     if files.is_empty() {
-        panic!("CAN'T FIND RELEVANT FILES FOR {:?}.", path);
+        panic!("CAN'T FIND MATCHING FILES FOR {:?}.", path);
     }
 
     if fastq {
