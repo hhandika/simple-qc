@@ -31,7 +31,7 @@ pub fn get_cli(version: &str) {
                             Arg::with_name("file")
                                 .short("f")
                                 .long("file")
-                                .help("Inputs a single file")
+                                .help("Inputs FASTQ files. Allows multiple inputs")
                                 .conflicts_with_all(&[ "dir", "wildcard", "wdir"])
                                 .multiple(true)
                                 .value_name("FASTQ FILE")
@@ -92,7 +92,7 @@ pub fn get_cli(version: &str) {
                                 .help("Inputs FASTA files. Allows multiple inputs")
                                 .conflicts_with_all(&[ "dir", "wildcard", "wdir"])
                                 .multiple(true)
-                                .value_name("FASTQ FILES")
+                                .value_name("FASTA FILES")
                             )
 
                         .arg(
