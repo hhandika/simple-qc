@@ -5,6 +5,43 @@
 
 simpleQC is a high-performance, single executable command-line app to aid with quality control for high-throughput sequencing data. It is easy to setup and requires no-dependency to run. It supports sequence quality check for Illumina Fastq raw-reads and assemlies in Fasta format, whether the file is compressed (gunzip) or not. The app can check a single file, multiple files in a folder, or tranverse nested directories. The idea is that you will be able to get data quality information of your entire NGS files in a single command. The final result will be saved in a csv file.
 
+## Quick Start
+To install simpleQC, you can download the latest version of the app for your operating system [here](https://github.com/hhandika/simple-qc/releases). The installation is similar to any single executable command-line application: unzip the file and copy it to your path variable. On MacOS, you may receive unidentified developer errors. Allow the program to run in the [security settings](https://support.apple.com/en-us/HT202491). In Linux or MacOS, you may also need to add executable permission for the app using this command in your terminal: `chmod +x sqc`.
+
+### Using simpleQC
+
+For raw-reads, you only need to change your directory to the parent directory of your files and then the command is as simple as below:
+
+```
+sqc fastq -w .
+```
+
+It will scan every FASTQ files inside the folder and other folders nested within it. 
+
+Similar command is also available for sequence assembly files in Fasta format.
+
+```
+sqc fasta -w .
+```
+
+simpleQC can process a single directory, multiple wildcards, or multiple files. For more options, use help commands:
+
+```
+sqc --help
+```
+
+For Fastq options:
+
+```
+sqc fastq --help
+```
+
+For fasta options:
+
+```
+sqc fasta --help
+```
+
 # Installation
 ## Compiling from sources
 simpleQC requires rust compiler and C compiler. For most users, you will only need to install the Rust compiler toolchain available through [rust-lang website](https://www.rust-lang.org/tools/install).  
@@ -54,41 +91,6 @@ zypper se -t pattern devel
 For Fedora
 ```
 sudo dnf groupinstall "Development Tools" "Development Libraries"
-```
-
-## Quick Start
-The idea behind simpleQC is that you can get quality data of all your NGS sequences in a single command. 
-
-For raw-reads, you only need to change your directory to the parent directory of your files and then the command is as simple as below:
-
-```
-sqc fastq -w .
-```
-
-It will scan every FASTQ files inside the folder and other folders nested within it. 
-
-Similar command is also available for sequence assembly files in Fasta format.
-
-```
-sqc fasta -w .
-```
-
-simpleQC can process a single directory, multiple wildcards, or multiple files. For more options, use help commands:
-
-```
-sqc --help
-```
-
-For Fastq options:
-
-```
-sqc fastq --help
-```
-
-For fasta options:
-
-```
-sqc fasta --help
 ```
 
 ## State of The Code
