@@ -1,3 +1,7 @@
+## 0.4.2
+- Fix cli help inconsistencies.
+- Update csv saving notification.
+
 ## 0.4.1
 - Fix confusing panic messages for a directory input.
 
