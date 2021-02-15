@@ -6,7 +6,7 @@
 simpleQC is a high-performance, single executable command-line app to aid with quality control for high-throughput sequencing data. It is easy to setup and requires no-dependency to run. It supports sequence quality check for Illumina Fastq raw-reads and assemlies in Fasta format, whether the file is compressed (gunzip) or not. The app can check a single file, multiple files in a folder, or tranverse nested directories. The idea is that you will be able to get data quality information of your entire NGS files in a single command. The final result will be saved in a csv file.
 
 # Quick Start
-To install simpleQC, you can download the latest version of the app for your operating system [here](https://github.com/hhandika/simple-qc/releases). The installation is similar to any single executable command-line application: unzip the file and copy it to your path variable. On MacOS, you may receive unidentified developer errors. Allow the program to run in the [security settings](https://support.apple.com/en-us/HT202491). In Linux or MacOS, you may also need to add executable permission for the app using this command in your terminal: `chmod +x sqc`.
+To install simpleQC, you can download the latest version of the app for your operating system [here](https://github.com/hhandika/simple-qc/releases). The installation is similar to any single executable command-line application: unzip the file and copy it to your path variable. On MacOS, you may receive unidentified developer errors. Allow the program to run in the [security settings](https://support.apple.com/en-us/HT202491). In Linux or MacOS, you may also need to add executable permission for the app using this command in your terminal: `chmod +x sqc`. If you are new to command line application, you could follow the installation instruction below.
 
 ## Using simpleQC
 
@@ -43,21 +43,83 @@ sqc fasta --help
 ```
 
 # Installation
-## If you are new to command line application
+## If you are new to command line applications
 You can download the latest version of the app for your operating system [here](https://github.com/hhandika/simple-qc/releases). Then, follow the installation instruction for your specific operating system.
 
 ### MacOS
 MacOS usually will unzip the file automatically after the file has been downloaded. You will have a single executable called `sqc` in your Downloads folder. If the file still in zip, unzip the file first before continuing the installation process. 
 
-In your terminal, change your directory the folder where you store the program and then:
+In your terminal, change your directory to the folder where you store the program and then:
 
 ```
 ./sqc --version
 ```
-It should display the program version in the terminal.
+It should display the program version in the terminal. If it throws an error, it is more likely that the program does not have executable permission. Try:
 
-However, this is not the most efficient way to  use the program. We will need to set it up, so that the program can be recognized by your terminal from anywhere in your system. 
+```
+chmod +x sqc
+```
 
+However, this is not the most efficient way to  use the program. We will need to set it up, so that the program can be recognized by your terminal from anywhere in your system. You can move the executable file to the path that is already recognized by your terminal to look for executable, such as `/usr/local/bin/`.
+
+```
+mv Downloads/sqc /usr/local/bin
+```
+
+If you already have a path register to your environment variable, you could just move the program the path. You can also create a new path and register it to your terminal. I tend to prefer to create one folder for a single executable app.  It can slow down your terminal startup if you have too many path registered in your environment variable. Other bioinformatic apps, such IQ-Tree, BPP, etch., are installed in similar fashion as simpleQC. I will include them all in the folder. If you don't have such folder yet, follow the instruction below:
+
+First, we will create a directory to store a single executable app in your HOME directory.
+
+```
+cd ~
+```
+
+Then, create a new folder in the directory. You could call it `programs` or anything you prefer.
+
+```
+mkdir programs
+```
+
+Check which shell do you use. Most recent Mac will use zsh, and the older ones may still use bash. To check your shell:
+
+```
+echo $SHELL
+```
+
+If it says zsh. Register the path below to .zshrc. If it is bash register it to .bash_profile. 
+
+If you don't care in which line the path should be added in your environment variable. You can use the command below. Change .zshrc to .bash_profile if your Mac still use bash. 
+
+```
+echo 'export PATH=$PATH:~/programs/' >> .zshrc
+```
+
+If you do care which line in the file the text should be appended, you can open the environment variable file using nano or vim:
+
+```
+nano .zshrc
+```
+
+or 
+
+```
+nano .bash_profile
+```
+
+Then paste the text below:
+
+```
+export PATH=$PATH:~/programs/
+```
+
+Next time you have a single executable app like simpleQC, you can just copy/move it to the `program` folder. Your terminal will recognize it right away. 
+
+To check if sqc is properly installed. Try to check the program version again from anywhere in your system:
+
+```
+sqc --version
+```
+If it displays the program version in your terminal, the program is ready to use.
 
 ## Compiling from sources
 simpleQC requires rust compiler and C compiler. For most users, you will only need to install the Rust compiler toolchain available through [rust-lang website](https://www.rust-lang.org/tools/install).  
