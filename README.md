@@ -7,10 +7,10 @@ simpleQC is a high-performance, single executable command-line app to aid with q
 
 # Table of Contents
 - [Quick Start](#quick-start)
-    - [Using simpleQC](#using-simpleqc)
 - [Installation](#installation)
     - [Quick Install](#quick-install)
     - [Compiling from sources](#compiling-from-sources)
+- [Usages](#usages)
 - [State of the Code](#state-of-the-code)
 - [Acknowledgment](#acknowledgment)
 
@@ -178,6 +178,61 @@ zypper se -t pattern devel
 For Fedora
 ```
 sudo dnf groupinstall "Development Tools" "Development Libraries"
+```
+
+## Usages
+
+### Command Structure
+
+The command structure is as below.
+
+```
+sqc <SUBCOMMAND> [OPTIONS] [FLAGS]
+```
+For example, if you want to process uncompressed fastq files.
+
+```
+sqc fastq -d . --nogz
+```
+
+### Subcommands
+
+`fastq` : to process raw-read sequences in fastq format. 
+`fasta` : to process assembly sequences in fasta format.
+
+### Options
+
+`-d` or `--dir`     : for a single directory input. 
+`-f` or `--file`    : for a file input. Support multiple file. 
+`-w` or `--walk`    : to tranverse across nested directory.
+`-c` or `--wcard`   : process files using wild card. 
+
+### Flags
+
+Both `--nogz` and `--gz` flags only work with `--dir` options.
+
+`--nogz` : only available for fastq subcommand. It will search for non-compressed fastq instead.
+
+`--gz` : by default if you use fasta subcommand, it will search for uncompressed fasta files. Using This flag will instead search for compressed fasta files.
+
+`--nocsv`: does not save the result to csv. Display result on console only. 
+
+`--version` : check the program version number.
+
+`--help` : display help messages.
+
+## Sample Usages
+
+1. Tranverse nested directories for raw reads
+
+```
+sqc fastq -w folder/
+```
+
+2. Process raw reads in a single directory
+
+```
+sqc fastq -d folder/
 ```
 
 ## State of The Code
