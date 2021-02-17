@@ -11,6 +11,8 @@ simpleQC is a high-performance, single executable command-line app to aid with q
     - [Quick Install](#quick-install)
     - [Compiling from sources](#compiling-from-sources)
 - [Usages](#usages)
+    - [Command Structure](#command-structure)
+    - [Sample Usages](#sample-usages)
 - [State of the Code](#state-of-the-code)
 - [Acknowledgment](#acknowledgment)
 
@@ -195,19 +197,19 @@ For example, if you want to process uncompressed fastq files.
 sqc fastq -d . --nogz
 ```
 
-### Subcommands
+#### Subcommands
 
 - `fastq` : to process raw-read sequences in fastq format. 
 - `fasta` : to process assembly sequences in fasta format.
 
-### Options
+#### Options
 
 - `-d` or `--dir`     : for a single directory input. 
 - `-f` or `--file`    : for a file input. Support multiple file. 
 - `-w` or `--walk`    : to tranverse across nested directory.
 - `-c` or `--wcard`   : process files using wild card. 
 
-### Flags
+#### Flags
 
 Both `--nogz` and `--gz` flags only work with `--dir` options.
 
@@ -221,7 +223,7 @@ Both `--nogz` and `--gz` flags only work with `--dir` options.
 
 - `--help` : display help messages.
 
-## Sample Usages
+### Sample Usages
 
 1. Tranverse nested directories for raw reads
 
