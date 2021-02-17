@@ -197,29 +197,29 @@ sqc fastq -d . --nogz
 
 ### Subcommands
 
-`fastq` : to process raw-read sequences in fastq format. 
-`fasta` : to process assembly sequences in fasta format.
+- `fastq` : to process raw-read sequences in fastq format. 
+- `fasta` : to process assembly sequences in fasta format.
 
 ### Options
 
-`-d` or `--dir`     : for a single directory input. 
-`-f` or `--file`    : for a file input. Support multiple file. 
-`-w` or `--walk`    : to tranverse across nested directory.
-`-c` or `--wcard`   : process files using wild card. 
+- `-d` or `--dir`     : for a single directory input. 
+- `-f` or `--file`    : for a file input. Support multiple file. 
+- `-w` or `--walk`    : to tranverse across nested directory.
+- `-c` or `--wcard`   : process files using wild card. 
 
 ### Flags
 
 Both `--nogz` and `--gz` flags only work with `--dir` options.
 
-`--nogz` : only available for fastq subcommand. It will search for non-compressed fastq instead.
+- `--nogz` : only available for fastq subcommand. It will search for non-compressed fastq instead.
 
-`--gz` : by default if you use fasta subcommand, it will search for uncompressed fasta files. Using This flag will instead search for compressed fasta files.
+- `--gz` : by default if you use fasta subcommand, it will search for uncompressed fasta files. Using This flag will instead search for compressed fasta files.
 
-`--nocsv`: does not save the result to csv. Display result on console only. 
+- `--nocsv`: does not save the result to csv. Display result on console only. 
 
-`--version` : check the program version number.
+- `--version` : check the program version number.
 
-`--help` : display help messages.
+- `--help` : display help messages.
 
 ## Sample Usages
 
