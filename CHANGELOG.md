@@ -1,3 +1,6 @@
+## 0.4.3
+- Minor improvements
+
 ## 0.4.2
 - Fix cli help inconsistencies.
 - Update csv saving notification.

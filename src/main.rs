@@ -13,8 +13,10 @@ mod output;
 
 use std::time::Instant;
 
+use clap::crate_version;
+
 fn main() {
-    let version = "0.4.2"; 
+    let version = crate_version!(); 
     
     let start_time = Instant::now();
 
