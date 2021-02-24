@@ -1,3 +1,6 @@
+## Upcoming
+- Improved command line structure.
+
 ## 0.4.3
 - Minor improvements
 
