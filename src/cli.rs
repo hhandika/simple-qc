@@ -98,7 +98,7 @@ pub fn get_cli(version: &str) {
                         .arg(
                             Arg::with_name("wildcard")
                                 .short("c")
-                                .long("wildcard")
+                                .long("wcard")
                                 .help("Finds files using wildcards. Allows multiple inputs")
                                 .conflicts_with_all(&[ "dir", "file","wdir"])
                                 .multiple(true)
@@ -108,7 +108,7 @@ pub fn get_cli(version: &str) {
                         .arg(
                             Arg::with_name("wdir")
                                 .short("w")
-                                .long("wdir")
+                                .long("walk")
                                 .help("Tranverses through nested directories")
                                 .conflicts_with_all(&[ "dir", "file", "wildcard"])
                                 .takes_value(true)
