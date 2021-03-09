@@ -1,3 +1,6 @@
+## 0.4.4
+- Fix inconsistent commands.
+
 ## 0.4.3
 - Minor improvements
 
