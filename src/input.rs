@@ -17,11 +17,10 @@ use crate::output;
 pub fn traverse_dir(path: &str, iscsv: bool, fastq: bool) {
     let entries = call_walkdir(path, fastq);
 
-    let is_path = true;
     if fastq {
-        par_process_fastq(&entries, is_path, iscsv);   
+        par_process_fastq(&entries, iscsv);   
     } else {
-        par_process_fasta(&entries, is_path, iscsv);
+        par_process_fasta(&entries, iscsv);
     }
 }
 
@@ -79,9 +78,9 @@ pub fn glob_dir(path: &PathBuf, iscsv: bool, fastq: bool) {
     }
 
     if fastq {
-        par_process_fastq(&files, false, iscsv);
+        par_process_fastq(&files, iscsv);
     } else {
-        par_process_fasta(&files, false, iscsv)
+        par_process_fasta(&files, iscsv)
     }
 }
 
@@ -92,7 +91,7 @@ pub fn call_glob(path: &PathBuf) -> Vec<PathBuf> {
         .collect()
 }
  
-pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
+pub fn par_process_fastq(files: &[PathBuf], iscsv: bool) {
     let (sender, receiver) = channel();
     
     files.into_par_iter()
@@ -102,10 +101,10 @@ pub fn par_process_fastq(files: &[PathBuf], path: bool, iscsv: bool) {
     
     let mut all_reads: Vec<FastqStats> = receiver.iter().collect();
     
-    output::write_fastq(&mut all_reads, path, iscsv);
+    output::write_fastq(&mut all_reads, iscsv);
 }
 
-pub fn par_process_fasta(files: &[PathBuf], path: bool, iscsv: bool) {
+pub fn par_process_fasta(files: &[PathBuf], iscsv: bool) {
     let (sender, receiver) = channel();
     
     files.into_par_iter()
@@ -115,7 +114,7 @@ pub fn par_process_fasta(files: &[PathBuf], path: bool, iscsv: bool) {
     
     let mut all_reads: Vec<FastaStats> = receiver.iter().collect();
     
-    output::write_fasta(&mut all_reads, path, iscsv);
+    output::write_fasta(&mut all_reads, iscsv);
 }
 
 #[cfg(test)]

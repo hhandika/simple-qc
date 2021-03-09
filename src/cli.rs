@@ -227,12 +227,10 @@ fn process_multiple_files(entries: &[&str], iscsv: bool, fastq: bool) {
     let files: Vec<PathBuf> = entries.iter()
         .map(PathBuf::from).collect();
 
-    let path = false;
-
     if fastq {
-        input::par_process_fastq(&files, path, iscsv);
+        input::par_process_fastq(&files, iscsv);
     } else {
-        input::par_process_fasta(&files, path, iscsv);
+        input::par_process_fasta(&files, iscsv);
     }
     
 }

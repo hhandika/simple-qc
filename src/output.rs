@@ -4,7 +4,7 @@ use num_format::{Locale, ToFormattedString};
 
 use crate::sequence::{FastqStats, FastaStats};
 
-pub fn write_fastq(results: &mut [FastqStats], path: bool, iscsv: bool) {
+pub fn write_fastq(results: &mut [FastqStats], iscsv: bool) {
     results.sort_by(|a, b| a.seqname.cmp(&b.seqname));
 
     println!("\n\x1b[1mResults:\x1b[0m");
@@ -16,11 +16,11 @@ pub fn write_fastq(results: &mut [FastqStats], path: bool, iscsv: bool) {
     println!("Total files: {}", results.len());
 
     if iscsv {
-        write_fastq_csv(results, path);
+        write_fastq_csv(results);
     }
 }
 
-pub fn write_fasta(stats: &mut [FastaStats], path: bool, iscsv: bool) {
+pub fn write_fasta(stats: &mut [FastaStats], iscsv: bool) {
     stats.sort_by(|a, b| a.seqname.cmp(&b.seqname));
 
     println!("\n\x1b[1mResults:\x1b[0m");
@@ -32,7 +32,7 @@ pub fn write_fasta(stats: &mut [FastaStats], path: bool, iscsv: bool) {
     println!("Total files: {}", stats.len());
     
     if iscsv {
-        write_fasta_csv(stats, path);
+        write_fasta_csv(stats);
     }
 }
 
@@ -173,10 +173,11 @@ fn write_fastq_console(all_reads: &FastqStats) {
     
 }
 
-fn write_fastq_csv(all_reads: &[FastqStats], path: bool) {
+fn write_fastq_csv(all_reads: &[FastqStats]) {
     let fname = "sQC-Fastq.csv";
     let output = File::create(&fname).expect("FILE EXISTS.");
     let mut line = LineWriter::new(output);
+    let path = !all_reads[0].path.is_empty();
 
     write_fastq_header(&mut line, path);
     
@@ -188,10 +189,11 @@ fn write_fastq_csv(all_reads: &[FastqStats], path: bool) {
     println!("The result is saved as {}", fname);
 }
 
-fn write_fasta_csv(stats: &[FastaStats], path: bool) {
+fn write_fasta_csv(stats: &[FastaStats]) {
     let fname = "sQC-Fasta.csv";
     let output = File::create(&fname).expect("FILE EXISTS.");
     let mut line = LineWriter::new(output);
+    let path = !stats[0].path.is_empty();
 
     write_fasta_header(&mut line, path);
     
