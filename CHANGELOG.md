@@ -1,3 +1,6 @@
+## v0.4.6
+- Fix confusing console and csv prints.
+
 ## v0.4.5
 - Auto detect paths and write them to the csv if available
 
