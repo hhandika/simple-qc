@@ -88,7 +88,7 @@ fn write_fasta_console(contigs: &FastaStats) {
         &contigs.n90.to_formatted_string(&Locale::en)).unwrap();
 
 
-    writeln!(buff, "# Contigs >750 bp\t\t: {}", 
+    writeln!(buff, "# Contigs >750 bp\t: {}", 
         &contigs.con750.to_formatted_string(&Locale::en)).unwrap();
     
     writeln!(buff, "# Contigs >1000 bp\t: {}", 
