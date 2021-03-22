@@ -88,13 +88,13 @@ fn write_fasta_console(contigs: &FastaStats) {
         &contigs.n90.to_formatted_string(&Locale::en)).unwrap();
 
 
-    writeln!(buff, "Contigs >750 bp\t\t: {}", 
+    writeln!(buff, "# Contigs >750 bp\t\t: {}", 
         &contigs.con750.to_formatted_string(&Locale::en)).unwrap();
     
-    writeln!(buff, "Contigs >1000 bp\t: {}", 
+    writeln!(buff, "# Contigs >1000 bp\t: {}", 
         &contigs.con1000.to_formatted_string(&Locale::en)).unwrap();
     
-    writeln!(buff, "Contigs >1500 bp\t: {}", 
+    writeln!(buff, "# Contigs >1500 bp\t: {}", 
         &contigs.con1500.to_formatted_string(&Locale::en)).unwrap();
     
     writeln!(buff).unwrap();
@@ -155,7 +155,7 @@ fn write_fastq_console(all_reads: &FastqStats) {
     writeln!(buff, "Mean\t\t\t: {:.2}",
     &all_reads.mean_qscores).unwrap();
 
-    writeln!(buff, "Bases < 20\t\t: {}",
+    writeln!(buff, "# Bases < 20\t\t: {}",
         &all_reads.sum_low_bases
         .to_formatted_string(&Locale::en)).unwrap();
 
@@ -223,8 +223,8 @@ fn write_fastq_header<W: Write>(line:&mut W, path: bool) {
         Median read length,\
         Stdev read length,\
         Mean q-score,\
-        Low base < 20,\
-        Low q-score ratio"
+        # Low base < 20,\
+        # Low q-score ratio"
     ).unwrap();
 }
 
@@ -271,9 +271,9 @@ fn write_fasta_header<W: Write>(line:&mut W, path: bool) {
         N50,\
         N75,\
         N90,\
-        No_contigs_>750bp,\
-        No_contigs_>1000bp,\
-        No_contigs_>1500bp"
+        #_contigs_>750bp,\
+        #_contigs_>1000bp,\
+        #_contigs_>1500bp"
     ).unwrap();
 }
 
